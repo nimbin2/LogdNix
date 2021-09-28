@@ -1,0 +1,215 @@
+:root {
+  --width-sidebar-hidden: 60px;
+  --color-background: #2f4050;
+
+}
+body {
+  background-color: #f3f3f4;
+  font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+  line-height: 1.42857143;
+  color: #676a6c;
+  transition: all ease .3s;
+}
+#SCC {
+  min-height: 100vh;
+  display: grid;
+  grid-template-areas: "sidebar main" "sidebar main";
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 40px auto;
+}
+
+.hideSideBar {
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.hideSideBar.active {
+  width: var(--width-sidebar-hidden);
+  background-color: var(--color-background);
+  height: 100vh;
+  left: 0;
+  z-index: 1;
+  opacity: 0.8;
+}
+#Sidebar {
+  position: sticky;
+  top: 0;
+  overflow: scroll;
+  max-height: 100vh;
+  grid-area: sidebar;
+  background-color: var(--color-background);
+}
+#Sidebar >ul {
+  float: right;
+  padding-left: 0;
+}
+#Sidebar.hidden {
+  width: var(--width-sidebar-hidden);
+  overflow: hidden;
+}
+#Sidebar .navbarButton.active {
+  color: #fff;
+  background-color: #c82840 !important;
+  opacity: .78;
+}
+.navbarButton {
+  all: unset;
+  cursor: pointer;
+  color: #a7b1c2;
+  font-weight: 600;
+  padding: 14px 20px 14px 25px;
+}
+.navbarButton:not([disabled]):hover {
+  background-color: #293846;
+  color: #fff;
+}
+.navbarButton:not([disabled]):focus {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+.navbarButton[disabled] {
+  cursor: unset;
+}
+.navBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+#TopBar {
+  position: sticky;
+  top: 0;
+  grid-area: topBar;
+  background-color: var(--color-background);
+}
+#TopBar .navbarButton {
+  padding-bottom: 6px !important;
+  padding-top: 12px !important;
+}
+#Main {
+  display: grid;
+  grid-area: main;
+  grid-template-areas: "topBar" "content" "bottomBar";
+  grid-template-rows: 40px auto 33px;
+}
+#Content {
+  grid-area: content;
+}
+#BottomBar {
+  grid-area: bottomBar;
+  position: sticky;
+  bottom: 0;
+  background-color: var(--color-background);
+}
+#BottomBar ul {
+  display: flex;
+  padding: 0;
+  margin: 0;
+}
+#BottomBar button {
+  padding-top: 8px;
+  padding-bottom: 3px;
+}
+
+.col {
+  padding: 0 25px 35px;
+}
+
+.item p {
+  white-space: break-spaces;
+}
+.item {
+  position: relative;
+}
+
+#EditThisItem + #EditItem {
+  display: inline-block !important;
+}
+#EditItem {
+  display: none !important;
+}
+#EditButton {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: inline-block;
+}
+
+#EditButton button[type="edit"] {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+ul.dropDown {
+  position: relative;
+  background-color: var(--color-background);
+  color: white;
+  padding: 0;
+  margin: 0;
+}
+.dropDown li {
+  list-style: none;
+  border-bottom: 1px solid white;
+}
+.dropDown li:last-child {
+  border-bottom: none
+}
+.dropDown button {
+  all: unset;
+  cursor: pointer;
+  padding: 0 15px 0 13px;
+  font-size: 14px;
+  width: 100%;
+  height: 100%;
+}
+.dropDown button:hover {
+
+}
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.white-card {
+  padding: 15px;
+  margin-bottom: 25px;
+  background-color: #fff;
+}
+.btn-default {
+  color: inherit;
+  background: #fff;
+  border: 1px solid #e7eaec;
+}
+
+textarea {
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #e5e6e7;
+  border-radius: 1px;
+  box-sizing: border-box;
+  color: inherit;
+  display: block;
+  padding: 6px 12px;
+  -webkit-transition: border-color .15s ease-in-out 0s,-webkit-box-shadow .15s ease-in-out 0s;
+  transition: border-color .15s ease-in-out 0s,-webkit-box-shadow .15s ease-in-out 0s;
+  -o-transition: border-color .15s ease-in-out 0s,box-shadow .15s ease-in-out 0s;
+  transition: border-color .15s ease-in-out 0s,box-shadow .15s ease-in-out 0s;
+  transition: border-color .15s ease-in-out 0s,box-shadow .15s ease-in-out 0s,-webkit-box-shadow .15s ease-in-out 0s;
+  width: 100%;
+}
