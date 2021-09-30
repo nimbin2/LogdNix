@@ -78,7 +78,6 @@ function App() {
         if (editITEM) {
             document.getElementById("Content").addEventListener('click', handleOutsideEditClick )
         } else {
-            console.log("CLOSWs")
             document.getElementById("Content").removeEventListener('click', handleOutsideEditClick )
             document.getElementById("EditThisItem")?.removeAttribute("id")
         }
@@ -165,21 +164,20 @@ function App() {
         saveBlock()
     }
 
-    const saveItem = (block, data) => {
+    const addItem = (block, data) => {
         modifyBlock(block, data)
-        statusAddITEM()
-        statusEditITEM()
+        statusAddITEM(false)
+        statusEditITEM(false)
     }
 
-    const editItem = (item, i, text) => {
-        console.log("EDIT")
+    const editItem = (item, i, data) => {
         for(let key in renderBlock.item[i]) {
             if(renderBlock.item[i].hasOwnProperty(key)) {
-                renderBlock.item[i][key] = text
+                renderBlock.item[i][key] = data || "";
             }
         }
-        console.log(renderBlock.item[i])
-        editITEM && statusEditITEM(false);
+        statusEditITEM(false);
+        statusAddITEM(false);
     }
 
     const removeItem = (item, i) => {
@@ -187,29 +185,42 @@ function App() {
         editITEM && statusEditITEM(false);
     }
 
-    const addText = (block) => {
+    const addItemText = (item, i) => {
+        console.log("WUSA", renderBlock.item)
         let input
+        let itemValue
+        if (renderBlock.item) {
+            for(let key in renderBlock.item[i]) {
+                if(renderBlock.item[i].hasOwnProperty(key)) {
+                    itemValue = renderBlock.item[i][key];
+                }
+            }
+        }
         statusAddITEM(
-            <form className="addITEM">
-                <textarea value={input} onChange={(e) => input = e.target.value} />
+            <form className={editITEM ? "editItem" : "addItem"}>
+                <textarea value={input} defaultValue={itemValue || ""} onChange={(e) => input = e.target.value} />
                 <button className="btn btn-default" onClick={(e) => {
                     e.preventDefault();
-                    input && input.length > 0 && saveItem(block, {text: input})
+                    item ? editItem(item, i, input) :
+                        input && input.length > 0 && addItem(renderBlock, {text: input});
                 }}>Save</button>
-                <button className="btn btn-default" onClick={() => statusAddITEM()}>Cancel</button>
+                <button className="btn btn-default" onClick={() => statusAddITEM(false)}>Cancel</button>
             </form>
         )
     }
 
     const editOptions = (item, i) => (
         <ul id="EditItem" className="dropDown">
-            <li><button onClick={() => editItem(item, i, "huuu")}>bearbeiten</button></li>
+            <li><button onClick={() => {
+                addItemText(item, i);
+                statusEditITEM(false);
+            }}>bKearbeiten</button></li>
             <li><button onClick={() => removeItem(item, i)}>löschen</button></li>
         </ul>
     )
 
     const handleOutsideEditClick = (e) => {
-        if ( document.getElementById("EditButton") && ! document.getElementById("EditButton").contains(e.target)) {
+        if ( document.getElementById("ButtonEdit") && ! document.getElementById("ButtonEdit").contains(e.target)) {
             statusEditITEM(false);
         }
     }
@@ -220,17 +231,12 @@ function App() {
         }
     }
 
-    const setEditItem = (e) => {
-        e.target.id = "EditThisItem"
-        statusEditITEM(e);
-    }
-
     const renderMain = () => (
         <Fragment>
             <div className="col">
                 <h2>{renderBlock.name}</h2>
                 <button disabled={addITEM} className="btn btn-default" onClick={() => {
-                    addText(renderBlock);
+                    addItemText();
                 }}>Add Text</button>
             </div>
             <div className="col">
@@ -240,15 +246,20 @@ function App() {
                 {renderBlock?.item?.map((item, i) => (
                     <div key={i} className="item white-card">
                         {item.header && (<h3>{item.header}</h3>)}
-                        <p>{item.text}</p>
-                        <div id="EditButton">
+                        {item.text && <p>{item.text}</p>}
+                        <div id="ButtonEdit">
                             <button type="edit"  className="btn btn-default"
-                                    onClick={(e) => !editITEM && setEditItem(e)}>...</button>
-                            {editITEM ? editOptions(item, i) : "nulll"}
+                                    onClick={(e) => {
+                                        e.target.id = "EditThisItem"
+                                        !editITEM && statusEditITEM(item);
+                                    }}>...</button>
+                            {editOptions(item, i)}
                         </div>
                     </div>
                 )) }
-                <div className="addITEM">{addITEM}</div>
+                { addITEM && (
+                    <div id={editITEM ? "EditItem" : "AddItem"}>{addITEM}</div>
+                )}
             </div>
         </Fragment>
     )

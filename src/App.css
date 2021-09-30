@@ -128,14 +128,14 @@ body {
 #EditItem {
   display: none !important;
 }
-#EditButton {
+#ButtonEdit {
   position: absolute;
   right: 0;
   top: 0;
   display: inline-block;
 }
 
-#EditButton button[type="edit"] {
+#ButtonEdit button[type="edit"] {
   position: absolute;
   right: 0;
   top: 0;
