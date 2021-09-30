@@ -1,4 +1,7 @@
 import React, {useState, Fragment, useEffect} from "react";
+import '../node_modules/font-awesome/css/font-awesome.min.css';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import './App.css';
 
 
@@ -71,8 +74,10 @@ function App() {
     const [renderBlock, statusRenderBlock] = useState(modifyBlocks[0]);
     const [hideNav, statusHideNav] = useState(false);
     const [reloadBlock, statusReloadBlock] = useState(true);
+    const [editMode, statusEditMode] = useState(true);
     const [addITEM, statusAddITEM] = useState("");
     const [editITEM, statusEditITEM] = useState(false);
+    const [disableButtons, statusDisableButtons] = useState(false);
 
     useEffect(() => {
         if (editITEM) {
@@ -89,11 +94,16 @@ function App() {
     useEffect(() => {
         !hideNav ?
             document.getElementById("Content").addEventListener('click', handleOutsideNavClick ) :
-            document.getElementById("Content").removeEventListener('click', handleOutsideNavClick )
+            document.getElementById("Content").removeEventListener('click', handleOutsideNavClick );
         return () => {
             document.getElementById("Content").removeEventListener("click", handleOutsideNavClick);
         }
     }, [hideNav])
+
+    useEffect(() => {
+        editMode ? statusHideNav(false) :
+            document.getElementById("Content").addEventListener('click', handleOutsideNavClick )
+    }, [editMode])
 
     const loadContent = (block) => {
         statusAddITEM("");
@@ -120,11 +130,13 @@ function App() {
         return blocks
     }
 
-    const renderNavButton = (block, k) => (
-        <button key={k || 0}
-                onClick={() => loadContent(block) }
-                disabled={ block.position === renderBlock.position && block.blocks && block.blocks.length === 0}
-                className={`navbarButton ${renderBlock.position.startsWith(block.position) && "active"}`}>{block.name}</button>
+    const renderNavButton = (block, i) => (
+        <div className="navItem" key={i || 0}>
+            <button onClick={() => loadContent(block) }
+                    disabled={disableButtons || renderBlock.position === block.position}
+                    className={`navbarButton ${renderBlock.position.startsWith(block.position) && "active"}`}>{block.name}</button>
+            { editMode && editNavOptions(block)}
+        </div>
     )
 
     const renderSidebar = (block) => (
@@ -168,6 +180,7 @@ function App() {
         modifyBlock(block, data)
         statusAddITEM(false)
         statusEditITEM(false)
+        statusDisableButtons(false);
     }
 
     const editItem = (item, i, data) => {
@@ -178,6 +191,12 @@ function App() {
         }
         statusEditITEM(false);
         statusAddITEM(false);
+        statusDisableButtons(false);
+    }
+
+    const removeBlock = (block) => {
+        console.log(block)
+        options.slice(block, 1)
     }
 
     const removeItem = (item, i) => {
@@ -188,6 +207,7 @@ function App() {
     const addItemText = (item, i) => {
         statusEditITEM(false)
         statusAddITEM(false)
+        statusDisableButtons(true)
         let input
         let itemValue
         if (renderBlock.item) {
@@ -199,25 +219,42 @@ function App() {
         }
         statusAddITEM(
             <form className={editITEM ? "editItem" : "addItem"}>
-                <textarea autoFocus value={input} defaultValue={itemValue || ""} onChange={(e) => input = e.target.value} />
+                <CKEditor editor={ClassicEditor} data={itemValue} onChange={(e, editor) => input = editor.getData()}/>
                 <button className="btn btn-default" onClick={(e) => {
                     e.preventDefault();
                     item ? editItem(item, i, input || itemValue) :
                         input && input.length > 0 && addItem(renderBlock, {text: input});
                 }}>Save</button>
-                <button className="btn btn-default" onClick={() => statusAddITEM(false)}>Cancel</button>
+                <button className="btn btn-default" onClick={() => {statusAddITEM(false); statusDisableButtons(false)}}>Cancel</button>
             </form>
         )
     }
 
     const editOptions = (item, i) => (
-        <ul id="EditItem" className="dropDown">
-            <li><button onClick={() => {
-                addItemText(item, i);
-                statusEditITEM(false);
-            }}>bearbeiten</button></li>
-            <li><button onClick={() => removeItem(item, i)}>löschen</button></li>
-        </ul>
+        <Fragment>
+            <button type="edit"  className="btn btn-default" disabled={disableButtons}
+                    onClick={(e) => {
+                        e.target.id = "EditThisItem";
+                        !editITEM && statusEditITEM(item);
+                    }}>...</button>
+            <ul id="EditItem" className="dropDown">
+                <li><button onClick={() => {
+                    addItemText(item, i);
+                    statusEditITEM(false);
+                }}>bearbeiten</button></li>
+                <li><button onClick={() => removeItem(item, i)}>löschen</button></li>
+            </ul>
+        </Fragment>
+    )
+
+    const editNavOptions = (block) => (
+        <Fragment>
+            <ul className="dropDown editNavItem-button">
+                <li><button onClick={() => {addItemText(block); statusEditITEM(false);}}><i className="fa fa-pencil" aria-hidden="true"/></button></li>
+                <li><button onClick={() => removeBlock(block)}><i className="fa fa-minus" aria-hidden="true"/></button></li>
+                <li><button onClick={() => removeBlock(block)}><i className="fa fa-plus" aria-hidden="true"/></button></li>
+            </ul>
+        </Fragment>
     )
 
     const handleOutsideEditClick = (e) => {
@@ -227,7 +264,7 @@ function App() {
     }
 
     const handleOutsideNavClick = (e) => {
-        if ( document.getElementById("Content").contains(e.target)) {
+        if ( document.getElementById("Content").contains(e.target) ) {
             statusHideNav(true)
         }
     }
@@ -236,9 +273,6 @@ function App() {
         <Fragment>
             <div className="col">
                 <h2>{renderBlock.name}</h2>
-                <button disabled={addITEM } className="btn btn-default" onClick={() => {
-                    addItemText();
-                }}>Add Text</button>
             </div>
             <div className="col">
                 {renderBlock?.text}
@@ -246,20 +280,19 @@ function App() {
             <div className="col">
                 {renderBlock?.item?.map((item, i) => (
                     <div key={i} className="item white-card">
-                        {item.header && (<h3>{item.header}</h3>)}
-                        {item.text && <p>{item.text}</p>}
+                        <div dangerouslySetInnerHTML={{ __html: item.text }} />
                         <div id="ButtonEdit">
-                            <button type="edit"  className="btn btn-default"
-                                    onClick={(e) => {
-                                        e.target.id = "EditThisItem"
-                                        !editITEM && statusEditITEM(item);
-                                    }}>...</button>
                             {editOptions(item, i)}
                         </div>
                     </div>
                 )) }
                 { addITEM && (
-                    <div id={editITEM ? "EditItem" : "AddItem"}>{addITEM}</div>
+                    <div id={editITEM ? "EditItem" : "AddItem"} className="white-card">{addITEM}</div>
+                )}
+                { editMode && (
+                    <button disabled={addITEM } className={`btn btn-default ${addITEM ? "d-none" : ""}`}  onClick={() => {
+                        addItemText();
+                    }}>Add Text</button>
                 )}
             </div>
         </Fragment>
@@ -273,15 +306,24 @@ function App() {
 
     return (
         <div id="SCC">
-            <div id="Sidebar" className={`${hideNav && "hidden"}`}>
-                <button className={`hideSideBar ${ hideNav && "active"}`} onClick={() => {
-                    statusHideNav(!hideNav)
-                }}>X</button>
+            <div id="Sidebar" className={`${hideNav && !editMode ? "hidden" : ""}`}>
+                {hideNav && !editMode && (
+                    <button className={`hideSideBar ${ hideNav && !editMode ? "active" : ""}`} onClick={() => {
+                        statusHideNav(!hideNav)
+                    }}>{hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : (<i className="fa fa-chevron-left" aria-hidden="true"/>)}
+                    </button>
+                )}
                 {renderSidebar(modifyBlocks)}
             </div>
             <div id="Main">
                 <div id="TopBar">
-                    {parentBlocks().map((block, k) => renderNavButton(block, k) )}
+                    <div className="topBar-items">
+                        {parentBlocks().map((block, k) => renderNavButton(block, k) )}
+                    </div>
+                    <button id="EditMode-button" disabled={disableButtons} className={editMode ? "active" : "inActivw"} onClick={() => {
+                        statusEditMode(!editMode);
+                        statusHideNav(false);
+                    }}>{editMode ? ("Admin") : ("User")}</button>
                 </div>
                 <div id="Content">
                     {renderBlock && ( renderMain() )}
