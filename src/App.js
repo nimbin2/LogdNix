@@ -186,7 +186,8 @@ function App() {
     }
 
     const addItemText = (item, i) => {
-        console.log("WUSA", renderBlock.item)
+        statusEditITEM(false)
+        statusAddITEM(false)
         let input
         let itemValue
         if (renderBlock.item) {
@@ -198,10 +199,10 @@ function App() {
         }
         statusAddITEM(
             <form className={editITEM ? "editItem" : "addItem"}>
-                <textarea value={input} defaultValue={itemValue || ""} onChange={(e) => input = e.target.value} />
+                <textarea autoFocus value={input} defaultValue={itemValue || ""} onChange={(e) => input = e.target.value} />
                 <button className="btn btn-default" onClick={(e) => {
                     e.preventDefault();
-                    item ? editItem(item, i, input) :
+                    item ? editItem(item, i, input || itemValue) :
                         input && input.length > 0 && addItem(renderBlock, {text: input});
                 }}>Save</button>
                 <button className="btn btn-default" onClick={() => statusAddITEM(false)}>Cancel</button>
@@ -214,7 +215,7 @@ function App() {
             <li><button onClick={() => {
                 addItemText(item, i);
                 statusEditITEM(false);
-            }}>bKearbeiten</button></li>
+            }}>bearbeiten</button></li>
             <li><button onClick={() => removeItem(item, i)}>löschen</button></li>
         </ul>
     )
@@ -235,7 +236,7 @@ function App() {
         <Fragment>
             <div className="col">
                 <h2>{renderBlock.name}</h2>
-                <button disabled={addITEM} className="btn btn-default" onClick={() => {
+                <button disabled={addITEM } className="btn btn-default" onClick={() => {
                     addItemText();
                 }}>Add Text</button>
             </div>
