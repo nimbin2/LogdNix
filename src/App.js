@@ -7,8 +7,6 @@ import {SortableContainer, SortableElement} from 'react-sortable-hoc';
 
 
 
-
-
 function App() {
     let options = [{
         name: "Home",
@@ -200,11 +198,11 @@ function App() {
     });
 
     const onSortEnd = ({oldIndex, newIndex}) => {
-        let element = parentBlock(renderBlock).blocks;
-        element.splice(oldIndex, 1);
-        element.splice(newIndex, 0, renderBlock);
-        console.log(element)
-        saveBlock(renderBlock)
+        let blocks = parentBlock(renderBlock).blocks;
+        blocks.splice(oldIndex, 1);
+        blocks.splice(newIndex, 0, renderBlock);
+        console.log(parentBlock(blocks[newIndex]))
+        saveBlock(blocks[newIndex])
     };
 
     const getBlock = (block) => {
@@ -221,13 +219,13 @@ function App() {
         statusReloadBlock(!reloadBlock)
     }
 
-    const setBlockItem = (block) => {
+    const setBlockBaseItem = (block) => {
         ! block.item &&  Object.assign(block, {item: []})
         saveBlock(block);
     }
 
     const modifyBlockItem = (block, data) => {
-        setBlockItem(block)
+        setBlockBaseItem(block)
         block.item.push(data)
         saveBlock(block)
     }
@@ -380,7 +378,7 @@ function App() {
                     }}>{hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : (<i className="fa fa-chevron-left" aria-hidden="true"/>)}
                     </button>
                 )}
-                {modifyBlocks && (<SortableList blocks={modifyBlocks} onSortEnd={onSortEnd}/>)}
+                {renderBlock && (<SortableList blocks={modifyBlocks} onSortEnd={onSortEnd}/>)}
                 {/*renderSidebar(modifyBlocks)*/}
 
             </div>
