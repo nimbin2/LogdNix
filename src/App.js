@@ -3,81 +3,87 @@ import '../node_modules/font-awesome/css/font-awesome.min.css';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import './App.css';
+import {SortableContainer, SortableElement} from 'react-sortable-hoc';
+
+
+
 
 
 function App() {
-    let options = [
-        {
-            name: "Mails",
-            item: [{text: "Der erste satrz"}],
-            blocks: [
-                {
-                    name: "FAQ"
-                }, {
-                    name: "Antwortblöcke"
-                }, {
-                    name: "Newsletter"
-                }
-            ]
-        }, {
-            name: "Positionen",
-            blocks: [
-                {
-                    name: "Kasse",
-                    blocks: [
-                        {
-                            name: "Check-In"
-                        }, {
-                            name: "Check-Out"
-                        }
-                    ]
-                }, {
-                    name: "Fenster",
-                    blocks: [
-                        {
-                            name: "Check-In Pre"
-                        }, {
-                            name: "Check-In Runner-Zettel"
-                        }, {
-                            name: "Routen drucken"
-                        }, {
-                            name: "Packen"
-                        }
-                    ]
-                }, {
-                    name: "Runner",
-                    blocks: [
-                        {
-                            name: "Vorbereitung"
-                        }, {
-                            name: "Routen"
-                        }
-                    ]
-                }
-            ]
-        }, {
-            name: "Schichtplan",
-            blocks: [
-                {
-                    name: "Schichten ändern",
-                }, {
-                    name: "Schichten anlegen",
-                }, {
-                    name: "Schichtplan"
-                }
-            ]
-        }, {
-            name: "Ordner"
-        }
-    ]
-    const [modifyBlocks, statusModifyBlocks] = useState(options);
-    const [renderBlock, statusRenderBlock] = useState(modifyBlocks[0]);
-    const [hideNav, statusHideNav] = useState(false);
-    const [reloadBlock, statusReloadBlock] = useState(true);
-    const [editMode, statusEditMode] = useState(true);
-    const [addITEM, statusAddITEM] = useState("");
-    const [editITEM, statusEditITEM] = useState(false);
-    const [disableButtons, statusDisableButtons] = useState(false);
+    let options = [{
+        name: "Home",
+        blocks: [
+            {
+                name: "Mails",
+                item: [{text: "Der erste satrz"}],
+                blocks: [{
+                        name: "FAQ"
+                    }, {
+                        name: "Antwortblöcke"
+                    }, {
+                        name: "Newsletter"
+                    }
+                ]
+            }, {
+                name: "Positionen",
+                blocks: [
+                    {
+                        name: "Kasse",
+                        blocks: [
+                            {
+                                name: "Check-In"
+                            }, {
+                                name: "Check-Out"
+                            }
+                        ]
+                    }, {
+                        name: "Fenster",
+                        blocks: [
+                            {
+                                name: "Check-In Pre"
+                            }, {
+                                name: "Check-In Runner-Zettel"
+                            }, {
+                                name: "Routen drucken"
+                            }, {
+                                name: "Packen"
+                            }
+                        ]
+                    }, {
+                        name: "Runner",
+                        blocks: [
+                            {
+                                name: "Vorbereitung"
+                            }, {
+                                name: "Routen"
+                            }
+                        ]
+                    }
+                ]
+            }, {
+                name: "Schichtplan",
+                blocks: [
+                    {
+                        name: "Schichten ändern",
+                    }, {
+                        name: "Schichten anlegen",
+                    }, {
+                        name: "Schichtplan"
+                    }
+                ]
+            }, {
+                name: "Ordner"
+            }]
+        }]
+    const [modifyBlocks, statusModifyBlocks] = useState(options)
+    const [renderBlock, statusRenderBlock] = useState(modifyBlocks[0])
+    const [hideNav, statusHideNav] = useState(false)
+    const [reloadBlock, statusReloadBlock] = useState(true)
+    const [editMode, statusEditMode] = useState(true)
+    const [addITEM, statusAddITEM] = useState("")
+    const [editITEM, statusEditITEM] = useState(false)
+    const [disableButtons, statusDisableButtons] = useState(false)
+    const [sortNavMode, statusSortNavMode] = useState(false)
 
     useEffect(() => {
         if (editITEM) {
@@ -110,14 +116,25 @@ function App() {
         statusEditITEM(false);
         statusRenderBlock(block);
     }
+
     // Modify modifyBlocks
-    const setOptionsPosition = (blocks, c) => {
+    const setOptionsPosition = (blocks, prePosition) => {
+        if (blocks.position) {
+            prePosition = `${blocks.position.splice(0, -1)} `
+        } else if (!prePosition) {
+            prePosition = "";
+        }
+
         blocks.forEach((block, i) => {
-            Object.assign(block, {position: c+i.toString()});
-            block.blocks && setOptionsPosition(block.blocks, `${c+i.toString()} ` )
+            Object.assign(block, {position: prePosition+i.toString()});
+            block.blocks && setOptionsPosition(block.blocks, `${prePosition+i.toString()} ` )
         })
     }
-    setOptionsPosition(modifyBlocks, "")
+    !modifyBlocks[0].blocks[0]?.position && setOptionsPosition(modifyBlocks)
+
+    const blocksPosition = (blocks) => {
+        return blocks[0].position?.slice(0, -1)
+    }
 
     // Get block.position parent blocks
     const parentBlocks = () => {
@@ -130,6 +147,18 @@ function App() {
         return blocks
     }
 
+    const parentBlock = (block) => {
+        let parentBlockPosition = block.position.split(" ");
+        parentBlockPosition.pop()
+
+        let execute
+        parentBlockPosition.forEach((i, c) => {
+            execute = c === 0 ? `modifyBlocks[${i}]` : execute+`.blocks[${i}]`
+        })
+        // eslint-disable-next-line no-eval
+        return eval(execute)
+    }
+
     const renderNavButton = (block, i) => (
         <div className="navItem" key={i || 0}>
             <button onClick={() => loadContent(block) }
@@ -139,16 +168,44 @@ function App() {
         </div>
     )
 
-    const renderSidebar = (block) => (
+    const renderSidebar = (blocks) => (
         <ul>
-            {Object.keys(block).map((i) => block[i].name && (
-                <li key={i} className="navBlock">
-                    {renderNavButton(block[i])}
-                    { block[i].blocks && renderBlock.position.startsWith(block[i].position) && renderSidebar(block[i].blocks)}
+            {blocks.map((block, i) => block.name && (
+                <li key={i} className="navBlock list-group-item" id={`NavItem-${blocks[i].position.replace(/ /g,"-")}`}>
+                    {renderNavButton(blocks[i])}
+                    { block.blocks && renderBlock.position.startsWith(block.position) && renderSidebar(block.blocks)}
                 </li>
             ))}
         </ul>
     )
+
+    const SidebarItem = SortableElement(({block}) => <li className="navBlock list-group-item" id={`NavItem-${block.position.replace(/ /g,"-")}`}>
+        {renderNavButton(block)}
+        { block.blocks && renderBlock.position.startsWith(block.position) && (<SortableList blocks={block.blocks} onSortEnd={onSortEnd}/>)}
+    </li>);
+
+    const SidebarSortableItem = SortableElement(({block}) => <li className="navBlock list-group-item" id={`NavItem-${block.position.replace(/ /g,"-")}`}>
+        {renderNavButton(block)}
+        { block.blocks && renderBlock.position.startsWith(block.position) && <SortableList lockAxis="y" blocks={block.blocks} onSortEnd={onSortEnd}/>}
+    </li>);
+
+    const SortableList = SortableContainer(({blocks}) => {
+        return (
+            <ul>
+                {blocks?.map((block, i) =>
+                    <SidebarSortableItem disabled={block.position !== renderBlock.position ? true : block.position === "0"} key={`item-${block.position}`} index={i} block={block} />
+                )}
+            </ul>
+        );
+    });
+
+    const onSortEnd = ({oldIndex, newIndex}) => {
+        let element = parentBlock(renderBlock).blocks;
+        element.splice(oldIndex, 1);
+        element.splice(newIndex, 0, renderBlock);
+        console.log(element)
+        saveBlock(renderBlock)
+    };
 
     const getBlock = (block) => {
         let execute
@@ -159,49 +216,60 @@ function App() {
         return eval(execute)
     }
 
-    const saveBlock = () => {
-        statusModifyBlocks(modifyBlocks)
-        statusRenderBlock(getBlock(renderBlock))
+    const saveBlock = (block) => {
+        statusRenderBlock(getBlock(block) || options.blocks)
         statusReloadBlock(!reloadBlock)
     }
 
     const setBlockItem = (block) => {
-        ! block.item &&  Object.assign(block, {item: []});
-        saveBlock();
+        ! block.item &&  Object.assign(block, {item: []})
+        saveBlock(block);
     }
 
-    const modifyBlock = (block, data) => {
+    const modifyBlockItem = (block, data) => {
         setBlockItem(block)
         block.item.push(data)
-        saveBlock()
+        saveBlock(block)
     }
 
     const addItem = (block, data) => {
-        modifyBlock(block, data)
+        modifyBlockItem(block, data)
         statusAddITEM(false)
         statusEditITEM(false)
-        statusDisableButtons(false);
+        statusDisableButtons(false)
     }
 
     const editItem = (item, i, data) => {
         for(let key in renderBlock.item[i]) {
             if(renderBlock.item[i].hasOwnProperty(key)) {
-                renderBlock.item[i][key] = data || "";
+                renderBlock.item[i][key] = data || ""
             }
         }
-        statusEditITEM(false);
-        statusAddITEM(false);
-        statusDisableButtons(false);
+        statusEditITEM(false)
+        statusAddITEM(false)
+        statusDisableButtons(false)
     }
 
     const removeBlock = (block) => {
-        console.log(block)
-        options.slice(block, 1)
+        let blockPosition
+        let pBlock
+        if (block.position.split(" ").length > 1) {
+            blockPosition = block.position.slice(-1)
+            pBlock = parentBlock(block)
+            delete pBlock.blocks[blockPosition]
+        } else {
+            blockPosition = block.position
+            pBlock = options.blocks
+            delete pBlock[blockPosition]
+        }
+        setOptionsPosition(pBlock.blocks, `${pBlock.position} `)
+        saveBlock(pBlock, block.position)
     }
 
     const removeItem = (item, i) => {
-        renderBlock.item.splice(i, 1);
-        editITEM && statusEditITEM(false);
+        renderBlock.item.splice(i, 1)
+        editITEM && statusEditITEM(false)
+        statusReloadBlock(!reloadBlock)
     }
 
     const addItemText = (item, i) => {
@@ -248,13 +316,12 @@ function App() {
     )
 
     const editNavOptions = (block) => (
-        <Fragment>
-            <ul className="dropDown editNavItem-button">
-                <li><button onClick={() => {addItemText(block); statusEditITEM(false);}}><i className="fa fa-pencil" aria-hidden="true"/></button></li>
-                <li><button onClick={() => removeBlock(block)}><i className="fa fa-minus" aria-hidden="true"/></button></li>
-                <li><button onClick={() => removeBlock(block)}><i className="fa fa-plus" aria-hidden="true"/></button></li>
-            </ul>
-        </Fragment>
+        <ul className="dropDown editNavItem-button">
+            <li><button onClick={() => {addItemText(block); statusEditITEM(false);}}><i className="fa fa-pencil" aria-hidden="true"/></button></li>
+            {block.position !== "0" && (
+                <li><button onClick={() => removeBlock(block)}><i className="fa fa-minus" aria-hidden="true"/></button></li>)}
+            <li><button onClick={() => removeBlock(block)}><i className="fa fa-plus" aria-hidden="true"/></button></li>
+        </ul>
     )
 
     const handleOutsideEditClick = (e) => {
@@ -306,14 +373,16 @@ function App() {
 
     return (
         <div id="SCC">
-            <div id="Sidebar" className={`${hideNav && !editMode ? "hidden" : ""}`}>
+            <div id="Sidebar" className={`list-group ${hideNav && !editMode ? "hidden" : ""}`}>
                 {hideNav && !editMode && (
                     <button className={`hideSideBar ${ hideNav && !editMode ? "active" : ""}`} onClick={() => {
                         statusHideNav(!hideNav)
                     }}>{hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : (<i className="fa fa-chevron-left" aria-hidden="true"/>)}
                     </button>
                 )}
-                {renderSidebar(modifyBlocks)}
+                {modifyBlocks && (<SortableList blocks={modifyBlocks} onSortEnd={onSortEnd}/>)}
+                {/*renderSidebar(modifyBlocks)*/}
+
             </div>
             <div id="Main">
                 <div id="TopBar">
