@@ -140,16 +140,21 @@ textarea {
   width: var(--width-sidebar-hidden);
   overflow: hidden;
 }
-#Sidebar .navbarButton.active {
-  color: #fff;
-  background-color: #c82840 !important;
-  opacity: .78;
-}
 #Sidebar .navbarButton.active[disabled] + .editNavItem-button {
   display: flex !important;
 }
+#Sidebar .navbarButton.preActive {
+  color: #fff;
+  background-color: var(--color-red) !important;
+  opacity: .78;
+}
 #Sidebar .navbarButton.active[disabled] {
   background-color: var(--color-green) !important;
+}
+#Sidebar .navbarButton.active {
+  color: #fff;
+  background-color: var(--color-red) !important;
+  opacity: .78;
 }
 .navbarButton {
   all: unset;
@@ -176,6 +181,9 @@ textarea {
   display: flex;
   flex-direction: column;
 }
+.navBlock li {
+  list-style: none;
+}
 
 ul.editNavItem-button {
   display: none !important;
@@ -185,6 +193,7 @@ ul.editNavItem-button {
   bottom: 0;
 }
 ul.editNavItem-button li {
+  position: relative;
   border: none;
 }
 ul.editNavItem-button button:hover {
@@ -193,6 +202,7 @@ ul.editNavItem-button button:hover {
 .navItem {
   position: relative;
 }
+
 ul.editNavItem-button button {
   width: auto;
   padding: 0 7px;
@@ -207,7 +217,11 @@ ul.editNavItem-button button {
   justify-content: space-between;
   background-color: var(--color-background);
 }
+.topBar-items li {
+  list-style: none;
+}
 .topBar-items {
+  all: unset;
   display: flex;
 }
 

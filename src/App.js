@@ -1,10 +1,9 @@
 import React, {useState, Fragment, useEffect} from "react";
 import '../node_modules/font-awesome/css/font-awesome.min.css';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
+import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import './App.css';
 import {SortableContainer, SortableElement} from 'react-sortable-hoc';
-
 
 
 function App() {
@@ -15,12 +14,12 @@ function App() {
                 name: "Mails",
                 item: [{text: "Der erste satrz"}],
                 blocks: [{
-                        name: "FAQ"
-                    }, {
-                        name: "Antwortblöcke"
-                    }, {
-                        name: "Newsletter"
-                    }
+                    name: "FAQ"
+                }, {
+                    name: "Antwortblöcke"
+                }, {
+                    name: "Newsletter"
+                }
                 ]
             }, {
                 name: "Positionen",
@@ -72,7 +71,7 @@ function App() {
             }, {
                 name: "Ordner"
             }]
-        }]
+    }]
     const [modifyBlocks, statusModifyBlocks] = useState(options)
     const [renderBlock, statusRenderBlock] = useState(modifyBlocks[0])
     const [hideNav, statusHideNav] = useState(false)
@@ -80,14 +79,16 @@ function App() {
     const [editMode, statusEditMode] = useState(true)
     const [addITEM, statusAddITEM] = useState("")
     const [editITEM, statusEditITEM] = useState(false)
+    const [addBlockPosition, statusAddBlockPosition] = useState(false)
     const [disableButtons, statusDisableButtons] = useState(false)
     const [sortNavMode, statusSortNavMode] = useState(false)
+    const [newBlockName, statusNewBlockName] = useState("")
 
     useEffect(() => {
         if (editITEM) {
-            document.getElementById("Content").addEventListener('click', handleOutsideEditClick )
+            document.getElementById("Content").addEventListener('click', handleOutsideEditClick)
         } else {
-            document.getElementById("Content").removeEventListener('click', handleOutsideEditClick )
+            document.getElementById("Content").removeEventListener('click', handleOutsideEditClick)
             document.getElementById("EditThisItem")?.removeAttribute("id")
         }
         return () => {
@@ -97,8 +98,8 @@ function App() {
 
     useEffect(() => {
         !hideNav ?
-            document.getElementById("Content").addEventListener('click', handleOutsideNavClick ) :
-            document.getElementById("Content").removeEventListener('click', handleOutsideNavClick );
+            document.getElementById("Content").addEventListener('click', handleOutsideNavClick) :
+            document.getElementById("Content").removeEventListener('click', handleOutsideNavClick);
         return () => {
             document.getElementById("Content").removeEventListener("click", handleOutsideNavClick);
         }
@@ -106,7 +107,7 @@ function App() {
 
     useEffect(() => {
         editMode ? statusHideNav(false) :
-            document.getElementById("Content").addEventListener('click', handleOutsideNavClick )
+            document.getElementById("Content").addEventListener('click', handleOutsideNavClick)
     }, [editMode])
 
     const loadContent = (block) => {
@@ -124,8 +125,8 @@ function App() {
         }
 
         blocks.forEach((block, i) => {
-            Object.assign(block, {position: prePosition+i.toString()});
-            block.blocks && setOptionsPosition(block.blocks, `${prePosition+i.toString()} ` )
+            Object.assign(block, {position: prePosition + i.toString()});
+            block.blocks && setOptionsPosition(block.blocks, `${prePosition + i.toString()} `)
         })
     }
     !modifyBlocks[0].blocks[0]?.position && setOptionsPosition(modifyBlocks)
@@ -151,47 +152,87 @@ function App() {
 
         let execute
         parentBlockPosition.forEach((i, c) => {
-            execute = c === 0 ? `modifyBlocks[${i}]` : execute+`.blocks[${i}]`
+            execute = c === 0 ? `modifyBlocks[${i}]` : execute + `.blocks[${i}]`
         })
         // eslint-disable-next-line no-eval
         return eval(execute)
     }
 
-    const renderNavButton = (block, i) => (
-        <div className="navItem" key={i || 0}>
-            <button onClick={() => loadContent(block) }
+    const renderNavButton = (block) => (
+        <div className="navItem">
+            <button onClick={() => loadContent(block)}
                     disabled={disableButtons || renderBlock.position === block.position}
-                    className={`navbarButton ${renderBlock.position.startsWith(block.position) && "active"}`}>{block.name}</button>
-            { editMode && editNavOptions(block)}
+                    className={`navbarButton ${(renderBlock.position.startsWith(block.position) && renderBlock.position !== block.position) ? "preActive" : (renderBlock.position === block.position && "active")}`}>{block.name}</button>
+            {renderBlock.position === block.position && editMode && editNavOptions(block)}
+        </div>
+    )
+
+    const renderNewNavBlock = (block) => (
+        <div className="navItem">
+            <form>
+                <input autoFocus value={newBlockName} onChange={(e) => statusNewBlockName(e.target.value)}/>
+                <button onClick={() => addBlockUnsetInput()}>Cancel</button>
+                <button disabled={!newBlockName || newBlockName.startsWith(" ") } onClick={() => addBlock(block, newBlockName, true)}>Save</button>
+            </form>
         </div>
     )
 
     const renderSidebar = (blocks) => (
         <ul>
-            {blocks.map((block, i) => block.name && (
-                <li key={i} className="navBlock list-group-item" id={`NavItem-${blocks[i].position.replace(/ /g,"-")}`}>
-                    {renderNavButton(blocks[i])}
-                    { block.blocks && renderBlock.position.startsWith(block.position) && renderSidebar(block.blocks)}
+            {`${addBlockPosition} 0` === blocks[0]?.position && (
+                <li>
+                    {renderNewNavBlock(parentBlock(blocks[0]))}
                 </li>
+            )}
+            {blocks.map((block, i) => block.name && (
+                <Fragment key={i}>
+                    <li className="navBlock list-group-item"
+                        id={`NavItem-${blocks[i].position.replace(/ /g, "-")}`}>
+                        {renderNavButton(blocks[i])}
+                        {block.blocks && renderBlock.position.startsWith(block.position) && renderSidebar(block.blocks)}
+                    </li>
+                    {(block.blocks && !block.blocks[0]?.name && addBlockPosition === block.position) || (!block.blocks && addBlockPosition === block.position) ? (
+                        <ul>
+                            <li>
+                                {renderNewNavBlock(block)}
+                            </li>
+                        </ul>
+                    ) : null}
+                </Fragment>
             ))}
         </ul>
     )
 
-    const SidebarItem = SortableElement(({block}) => <li className="navBlock list-group-item" id={`NavItem-${block.position.replace(/ /g,"-")}`}>
-        {renderNavButton(block)}
-        { block.blocks && renderBlock.position.startsWith(block.position) && (<SortableList blocks={block.blocks} onSortEnd={onSortEnd}/>)}
-    </li>);
+    const SidebarItem = SortableElement(({block}) =>
+        <li className="navBlock list-group-item" id={`NavItem-${block.position.replace(/ /g, "-")}`}>
+            {renderNavButton(block)}
+            {block.blocks && renderBlock.position.startsWith(block.position) && (
+                <RenderSidebarSortable blocks={block.blocks} onSortEnd={onSortEnd}/>
+            )}
+        </li>
+    );
 
-    const SidebarSortableItem = SortableElement(({block}) => <li className="navBlock list-group-item" id={`NavItem-${block.position.replace(/ /g,"-")}`}>
-        {renderNavButton(block)}
-        { block.blocks && renderBlock.position.startsWith(block.position) && <SortableList lockAxis="y" blocks={block.blocks} onSortEnd={onSortEnd}/>}
-    </li>);
+    const SidebarSortableItem = SortableElement(({block}) => <Fragment>
+        <li className="navBlock list-group-item" id={`NavItem-${block.position.replace(/ /g, "-")}`}>
+            {renderNavButton(block)}
+            {block.blocks && renderBlock.position.startsWith(block.position) &&
+            <RenderSidebarSortable lockAxis="y" blocks={block.blocks} onSortEnd={onSortEnd}/>}
+        </li>
+    </Fragment>);
 
-    const SortableList = SortableContainer(({blocks}) => {
+
+    const RenderSidebarSortable = SortableContainer(({blocks}) => {
         return (
             <ul>
+                {addBlockPosition && (
+                        <li>
+                            {renderNavButton("InputBlock")}
+                        </li>
+                )}
                 {blocks?.map((block, i) =>
-                    <SidebarSortableItem disabled={block.position !== renderBlock.position ? true : block.position === "0"} key={`item-${block.position}`} index={i} block={block} />
+                    <SidebarSortableItem
+                        disabled={block.position !== renderBlock.position ? true : block.position === "0"}
+                        key={`item-${block.position}`} index={i} block={block}/>
                 )}
             </ul>
         );
@@ -208,44 +249,37 @@ function App() {
     const getBlock = (block) => {
         let execute
         block.position.split(" ").forEach((i, c) => {
-            execute = c === 0 ? `modifyBlocks[${i}]` : execute+`.blocks[${i}]`
+            execute = c === 0 ? `modifyBlocks[${i}]` : execute + `.blocks[${i}]`
         })
         // eslint-disable-next-line no-eval
         return eval(execute)
     }
 
     const saveBlock = (block) => {
+        setOptionsPosition(block.blocks, `${block.position} `)
         statusRenderBlock(getBlock(block) || options.blocks)
         statusReloadBlock(!reloadBlock)
     }
 
-    const setBlockBaseItem = (block) => {
-        ! block.item &&  Object.assign(block, {item: []})
-        saveBlock(block);
-    }
+    const addBlock = (block, name, add) => {
+        if (add) {
+            statusAddBlockPosition(block.position)
 
-    const modifyBlockItem = (block, data) => {
-        setBlockBaseItem(block)
-        block.item.push(data)
-        saveBlock(block)
-    }
+            !block.blocks && Object.assign(block, {blocks: []})
+            block.blocks.unshift({name: name})
+            saveBlock(block)
 
-    const addItem = (block, data) => {
-        modifyBlockItem(block, data)
-        statusAddITEM(false)
-        statusEditITEM(false)
-        statusDisableButtons(false)
-    }
-
-    const editItem = (item, i, data) => {
-        for(let key in renderBlock.item[i]) {
-            if(renderBlock.item[i].hasOwnProperty(key)) {
-                renderBlock.item[i][key] = data || ""
-            }
+            addBlockUnsetInput()
+        } else {
+            statusDisableButtons(true)
+            statusAddBlockPosition(block.position)
         }
-        statusEditITEM(false)
-        statusAddITEM(false)
+    }
+
+    const addBlockUnsetInput = () => {
         statusDisableButtons(false)
+        statusAddBlockPosition(false)
+        statusNewBlockName("")
     }
 
     const removeBlock = (block) => {
@@ -260,8 +294,43 @@ function App() {
             pBlock = options.blocks
             delete pBlock[blockPosition]
         }
-        setOptionsPosition(pBlock.blocks, `${pBlock.position} `)
         saveBlock(pBlock, block.position)
+    }
+
+
+    const saveItem = (block) => {
+        statusRenderBlock(getBlock(block) || options.blocks)
+        statusReloadBlock(!reloadBlock)
+    }
+
+    const setBaseItem = (block) => {
+        !block.item && Object.assign(block, {item: []})
+        saveItem(block);
+    }
+
+    const modifyItem = (block, data) => {
+        setBaseItem(block)
+        block.item.push(data)
+        saveItem(block)
+    }
+
+    const addItem = (block, data) => {
+        modifyItem(block, data)
+        statusAddITEM(false)
+        statusEditITEM(false)
+        statusDisableButtons(false)
+    }
+
+    const editItem = (item, i, data) => {
+        for (let key in renderBlock.item[i]) {
+            if (renderBlock.item[i].hasOwnProperty(key)) {
+                renderBlock.item[i][key] = data || ""
+            }
+        }
+
+        statusEditITEM(false)
+        statusAddITEM(false)
+        statusDisableButtons(false)
     }
 
     const removeItem = (item, i) => {
@@ -277,8 +346,8 @@ function App() {
         let input
         let itemValue
         if (renderBlock.item) {
-            for(let key in renderBlock.item[i]) {
-                if(renderBlock.item[i].hasOwnProperty(key)) {
+            for (let key in renderBlock.item[i]) {
+                if (renderBlock.item[i].hasOwnProperty(key)) {
                     itemValue = renderBlock.item[i][key];
                 }
             }
@@ -290,46 +359,71 @@ function App() {
                     e.preventDefault();
                     item ? editItem(item, i, input || itemValue) :
                         input && input.length > 0 && addItem(renderBlock, {text: input});
-                }}>Save</button>
-                <button className="btn btn-default" onClick={() => {statusAddITEM(false); statusDisableButtons(false)}}>Cancel</button>
+                }}>Save
+                </button>
+                <button className="btn btn-default" onClick={() => {
+                    statusAddITEM(false);
+                    statusDisableButtons(false)
+                }}>Cancel
+                </button>
             </form>
         )
     }
 
     const editOptions = (item, i) => (
         <Fragment>
-            <button type="edit"  className="btn btn-default" disabled={disableButtons}
+            <button type="edit" className="btn btn-default" disabled={disableButtons}
                     onClick={(e) => {
                         e.target.id = "EditThisItem";
                         !editITEM && statusEditITEM(item);
-                    }}>...</button>
+                    }}>...
+            </button>
             <ul id="EditItem" className="dropDown">
-                <li><button onClick={() => {
-                    addItemText(item, i);
-                    statusEditITEM(false);
-                }}>bearbeiten</button></li>
-                <li><button onClick={() => removeItem(item, i)}>löschen</button></li>
+                <li>
+                    <button onClick={() => {
+                        addItemText(item, i);
+                        statusEditITEM(false);
+                    }}>bearbeiten
+                    </button>
+                </li>
+                <li>
+                    <button onClick={() => removeItem(item, i)}>löschen</button>
+                </li>
             </ul>
         </Fragment>
     )
 
     const editNavOptions = (block) => (
         <ul className="dropDown editNavItem-button">
-            <li><button onClick={() => {addItemText(block); statusEditITEM(false);}}><i className="fa fa-pencil" aria-hidden="true"/></button></li>
-            {block.position !== "0" && (
-                <li><button onClick={() => removeBlock(block)}><i className="fa fa-minus" aria-hidden="true"/></button></li>)}
-            <li><button onClick={() => removeBlock(block)}><i className="fa fa-plus" aria-hidden="true"/></button></li>
+            <li>
+                <button onClick={() => {
+                    addItemText(block)
+                    statusEditITEM(false)
+                }}><i className="fa fa-pencil" aria-hidden="true"/></button>
+            </li>
+            {block.position !== "0" && (<li>
+                <button onClick={() => removeBlock(block)}><i className="fa fa-minus" aria-hidden="true"/></button>
+            </li>)}
+            <li>
+                <button onClick={() => {
+                    if (!addBlockPosition) {
+                        addBlock(block)
+                    } else {
+                        addBlockUnsetInput()
+                    }
+                }}><i className="fa fa-plus" aria-hidden="true"/></button>
+            </li>
         </ul>
     )
 
     const handleOutsideEditClick = (e) => {
-        if ( document.getElementById("ButtonEdit") && ! document.getElementById("ButtonEdit").contains(e.target)) {
+        if (document.getElementById("ButtonEdit") && !document.getElementById("ButtonEdit").contains(e.target)) {
             statusEditITEM(false);
         }
     }
 
     const handleOutsideNavClick = (e) => {
-        if ( document.getElementById("Content").contains(e.target) ) {
+        if (document.getElementById("Content").contains(e.target)) {
             statusHideNav(true)
         }
     }
@@ -345,17 +439,17 @@ function App() {
             <div className="col">
                 {renderBlock?.item?.map((item, i) => (
                     <div key={i} className="item white-card">
-                        <div dangerouslySetInnerHTML={{ __html: item.text }} />
+                        <div dangerouslySetInnerHTML={{__html: item.text}}/>
                         <div id="ButtonEdit">
                             {editOptions(item, i)}
                         </div>
                     </div>
-                )) }
-                { addITEM && (
+                ))}
+                {addITEM && (
                     <div id={editITEM ? "EditItem" : "AddItem"} className="white-card">{addITEM}</div>
                 )}
-                { editMode && (
-                    <button disabled={addITEM } className={`btn btn-default ${addITEM ? "d-none" : ""}`}  onClick={() => {
+                {editMode && (
+                    <button disabled={addITEM} className={`btn btn-default ${addITEM ? "d-none" : ""}`} onClick={() => {
                         addItemText();
                     }}>Add Text</button>
                 )}
@@ -373,30 +467,32 @@ function App() {
         <div id="SCC">
             <div id="Sidebar" className={`list-group ${hideNav && !editMode ? "hidden" : ""}`}>
                 {hideNav && !editMode && (
-                    <button className={`hideSideBar ${ hideNav && !editMode ? "active" : ""}`} onClick={() => {
+                    <button className={`hideSideBar ${hideNav && !editMode ? "active" : ""}`} onClick={() => {
                         statusHideNav(!hideNav)
-                    }}>{hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : (<i className="fa fa-chevron-left" aria-hidden="true"/>)}
+                    }}>{hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : (
+                        <i className="fa fa-chevron-left" aria-hidden="true"/>)}
                     </button>
                 )}
-                {renderBlock && (<SortableList blocks={modifyBlocks} onSortEnd={onSortEnd}/>)}
-                {/*renderSidebar(modifyBlocks)*/}
+                {/*renderBlock && (<RenderSidebarSortable blocks={modifyBlocks} onSortEnd={onSortEnd}/>)*/}
+                {renderSidebar(modifyBlocks)}
 
             </div>
             <div id="Main">
                 <div id="TopBar">
-                    <div className="topBar-items">
-                        {parentBlocks().map((block, k) => renderNavButton(block, k) )}
-                    </div>
-                    <button id="EditMode-button" disabled={disableButtons} className={editMode ? "active" : "inActivw"} onClick={() => {
-                        statusEditMode(!editMode);
-                        statusHideNav(false);
-                    }}>{editMode ? ("Admin") : ("User")}</button>
+                    <ul className="topBar-items">
+                        {parentBlocks().map((block, k) => <li key={k}>{renderNavButton(block)}</li>)}
+                    </ul>
+                    <button id="EditMode-button" disabled={disableButtons} className={editMode ? "active" : "inActivw"}
+                            onClick={() => {
+                                statusEditMode(!editMode);
+                                statusHideNav(false);
+                            }}>{editMode ? ("Admin") : ("User")}</button>
                 </div>
                 <div id="Content">
-                    {renderBlock && ( renderMain() )}
+                    {renderBlock && (renderMain())}
                 </div>
                 <div id="BottomBar">
-                    {renderBlock && ( renderBottomBar() )}
+                    {renderBlock && (renderBottomBar())}
                 </div>
             </div>
         </div>
