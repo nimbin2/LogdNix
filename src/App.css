@@ -97,7 +97,7 @@ textarea {
 
 
 
-#SCC {
+#LoggdNix {
   min-height: 100vh;
   display: grid;
   grid-template-areas: "sidebar main" "sidebar main";
@@ -136,11 +136,16 @@ textarea {
   float: right;
   padding-left: 0;
 }
+
+#Sidebar ul.button-editBlock {
+  display: flex !important;
+}
+
 #Sidebar.hidden {
   width: var(--width-sidebar-hidden);
   overflow: hidden;
 }
-#Sidebar .navbarButton.active[disabled] + .editNavItem-button {
+#Sidebar .navbarButton.active[disabled] + .button-editBlock {
   display: flex !important;
 }
 #Sidebar .navbarButton.preActive {
@@ -148,12 +153,9 @@ textarea {
   background-color: var(--color-red) !important;
   opacity: .78;
 }
-#Sidebar .navbarButton.active[disabled] {
-  background-color: var(--color-green) !important;
-}
 #Sidebar .navbarButton.active {
   color: #fff;
-  background-color: var(--color-red) !important;
+  background-color: var(--color-green) !important;
   opacity: .78;
 }
 .navbarButton {
@@ -185,25 +187,28 @@ textarea {
   list-style: none;
 }
 
-ul.editNavItem-button {
+ul.button-editBlock {
   display: none !important;
   background-color: transparent;
   position: absolute;
   left: 0;
   bottom: 0;
 }
-ul.editNavItem-button li {
+ul.button-editBlock li {
   position: relative;
   border: none;
 }
-ul.editNavItem-button button:hover {
+ul.button-editBlock button[disabled] {
+  opacity: .4;
+}
+ul.button-editBlock button:not[disabled]:hover {
   color: var(--color-green);
 }
 .navItem {
   position: relative;
 }
 
-ul.editNavItem-button button {
+ul.button-editBlock button {
   width: auto;
   padding: 0 7px;
   font-size: 10px;
@@ -217,10 +222,10 @@ ul.editNavItem-button button {
   justify-content: space-between;
   background-color: var(--color-background);
 }
-.topBar-items li {
+#TopBar li, #BottomBar li {
   list-style: none;
 }
-.topBar-items {
+#TopBar ul, #BottomBar ul {
   all: unset;
   display: flex;
 }
