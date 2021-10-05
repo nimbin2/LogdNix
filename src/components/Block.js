@@ -76,6 +76,8 @@ class Block extends Component {
     static statusAddBLOCK
     static buttonsDisabled
     static statusButtonsDisabled
+    static isAdmin = true
+    static statusIsAdmin
 
     static checkPreActive = (block) => {
         return Block.active.position === block.position ?  false : Block.active.position.toString().startsWith(block.position.toString())
@@ -138,19 +140,31 @@ class Block extends Component {
         return Block.parent(block).blocks.splice(block.position.pop(), 1);
     }
 
-    static renderEditButton = (block) => (
+    static renderEditButton = (block) => Block.isAdmin && (
         <ul className="button-editBlock dropDown">
             <li>
                 <button disabled={Block.buttonsDisabled && Block.buttonsDisabled !== "editBlock"} onClick={() => {
+                    if (Block.editBLOCK?.name) {
+                        Block.endRenderEdit()
+                    } else {
                         Block.statusEditBLOCK(block)
                         Block.statusButtonsDisabled("editBlock")
-                    }}><i className="fa fa-pencil" aria-hidden="true"/></button>
+                        OutsideClick.statusInput({id: "EditBlock",function: () => Block.endRenderEdit() })
+                    }
+                }}><i className="fa fa-pencil" aria-hidden="true"/></button>
             </li>
             <li>
                 <button disabled={Block.buttonsDisabled && Block.buttonsDisabled !== "addBlock"} onClick={() => {
+                    if (Block.addBLOCK?.name) {
+                        Block.statusAddBLOCK()
+                        Block.statusButtonsDisabled()
+                        Block.endRenderAdd()
+                    } else {
                         Block.statusAddBLOCK(block)
                         Block.statusButtonsDisabled("addBlock")
-                    }}><i className="fa fa-plus" aria-hidden="true"/></button>
+                        OutsideClick.statusInput({id: "EditBlock",function: () => Block.endRenderAdd() })
+                    }
+                }}><i className="fa fa-plus" aria-hidden="true"/></button>
             </li>
             {block.position !== "0" && (<li>
                 <button disabled={Block.buttonsDisabled} onClick={() => Block.remove(block)}><i className="fa fa-minus" aria-hidden="true"/></button>
@@ -158,43 +172,45 @@ class Block extends Component {
         </ul>
     )
 
+    static endRenderAdd = () => {
+        Block.statusAddBLOCK()
+        Block.statusButtonsDisabled()
+        OutsideClick.statusInput()
+    }
     static renderAddBlock = (block) => {
         let input
-        let endRenderAdd = () => {
-            Block.statusAddBLOCK()
-            Block.statusButtonsDisabled()
-        }
-        return <form>
+        return <form id="EditBlock">
             <input type="text" autoFocus value={input} onChange={(e) => input = e.target.value}/>
             <button disabled={Block.buttonsDisabled && Block.buttonsDisabled !== "addBlock"} onClick={(e) => {
                 e.preventDefault()
                 let addBlock = Block.add(block, input)
                 Block.statusActive(Block.get([...addBlock.position, 0]))
-                endRenderAdd()
+                Block.endRenderAdd()
             }}><i className="fa fa-check" aria-hidden="true"/></button>
             <button onClick={(e) => {
                 e.preventDefault()
-                endRenderAdd()
-            }}><i className="fa fa-close" aria-hiddern="true"/></button>
+                Block.endRenderAdd()
+            }}><i className="fa fa-close" aria-hidden="true"/></button>
         </form>
     }
 
+    static endRenderEdit = () => {
+        Block.statusEditBLOCK()
+        Block.statusButtonsDisabled()
+        OutsideClick.statusInput()
+    }
     static renderEditName = (block) => {
         let input
-        let endRenderEdit = () => {
-            Block.statusEditBLOCK()
-            Block.statusButtonsDisabled()
-        }
         return <form id="EditBlock">
             <input type="text" autoFocus defaultValue={block.name} onChange={e => input = e.target.value}/>
             <button disabled={Block.buttonsDisabled && Block.buttonsDisabled !== "editBlock"} onClick={(e) => {
                 e.preventDefault()
                 Block.statusActive(Block.edit(block, input && !input.startsWith(" ") ? input : block.name))
-                endRenderEdit()
+                Block.endRenderEdit()
             }}><i className="fa fa-check" aria-hidden="true"/></button>
             <button onClick={(e) => {
                 e.preventDefault()
-                endRenderEdit()
+                Block.endRenderEdit()
             }}><i className="fa fa-close" aria-hidden="true"/></button>
         </form>
     }

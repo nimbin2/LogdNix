@@ -2,14 +2,14 @@ import {Component} from "react";
 
 class OutsideClick extends Component {
 
-    static id
-    static statusId
-    static closeFunction
+    static input
 
     static handleOutsideClick = (e) => {
-        if (document.getElementById(OutsideClick.id) && !document.getElementById(OutsideClick.id).contains(e.target)) {
-            OutsideClick.statusId(false);
-        }
+        OutsideClick.input.function()
+        /*
+        if (document.getElementById(OutsideClick.input.id) && !document.getElementById(OutsideClick.input.id).contains(e.target)) {
+            OutsideClick.input.function()
+        }*/
     }
 }
 

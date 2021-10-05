@@ -11,57 +11,79 @@ function App() {
     const [active, statusActive] = useState(Block.active)
     const [editBLOCK, statusEditBLOCK] = useState(Block.editBLOCK)
     const [addBLOCK, statusAddBLOCK] = useState(Block.addBLOCK)
-    const [outsideClickId, statusOutsideClickId] = useState()
+    const [outsideClickInput, statusOutsideClickInput] = useState()
     const [renderSideBar, statusRenderSideBar] = useState()
     const [renderTopBar, statusRenderTopBar] = useState()
     const [renderBottomBar, statusRenderBottomBar] = useState()
     const [buttonsDisabled, statusButtonsDisabled] = useState(false)
+    const [isAdmin, statusIsAdmin] = useState(Block.isAdmin)
+    const [hideNav, statusHideNav] = useState(false)
 
 
     useEffect(() => {
         Block.active = active
         Block.statusActive = statusActive
         Block.active = active
-        rerennderNavbar()
+        reRenderNavbar()
     }, [active])
 
     useEffect(() => {
         Block.editBLOCK = editBLOCK
         Block.statusEditBLOCK = statusEditBLOCK
-        rerennderNavbar()
+        reRenderNavbar()
     }, [editBLOCK])
 
     useEffect(() => {
         Block.addBLOCK = addBLOCK
         Block.statusAddBLOCK = statusAddBLOCK
         Block.addBLOCK = addBLOCK
-        rerennderNavbar()
+        reRenderNavbar()
     }, [addBLOCK])
 
     useEffect(() => {
-        OutsideClick.id = outsideClickId
-        OutsideClick.statusId = statusOutsideClickId
+        OutsideClick.input = outsideClickInput
+        OutsideClick.statusInput = statusOutsideClickInput
 
-        if (OutsideClick.id) {
+        if (OutsideClick.input) {
             document.getElementById("Content").addEventListener('click', OutsideClick.handleOutsideClick)
         } else {
+            OutsideClick.input?.function()
             document.getElementById("Content").removeEventListener('click', OutsideClick.handleOutsideClick)
         }
         return () => {
             document.getElementById("Content").removeEventListener("click", OutsideClick.handleOutsideClick);
         }
-    }, [outsideClickId])
+    }, [outsideClickInput])
 
     useEffect(() => {
         Block.buttonsDisabled = buttonsDisabled
         Block.statusButtonsDisabled = statusButtonsDisabled
-        rerennderNavbar()
+        reRenderNavbar()
     }, [buttonsDisabled])
 
+    useEffect(() => {
+        Block.isAdmin = isAdmin
+        Block.statusIsAdmin = statusIsAdmin
+        reRenderNavbar()
+        !isAdmin && !hideNav && OutsideClick.statusInput({id: "#Sidebar",function: () => Navbar.statusHideNav(true) })
+    }, [isAdmin])
+
+    useEffect(() => {
+        Navbar.hideNav = hideNav
+        Navbar.statusHideNav = statusHideNav
+        if (!hideNav && !isAdmin) {
+            OutsideClick.statusInput({id: "#Sidebar",function: () => Navbar.statusHideNav(true) })
+        }  else {
+            OutsideClick.statusInput()
+        }
+        return () => {
+            OutsideClick.statusInput()
+        }
+    }, [hideNav])
 
     Block.positionsSet(Block.options, [])
 
-    const rerennderNavbar = () => {
+    const reRenderNavbar = () => {
         statusRenderSideBar(Navbar.renderSideBar())
         statusRenderTopBar(Navbar.renderTopBar())
         statusRenderBottomBar(Navbar.renderBottomBar())
@@ -70,13 +92,17 @@ function App() {
 
 
     return (
-        <div id="LoggdNix">
-            <div id="Sidebar">
+        <div id="LogdNix">
+            <div id="Sidebar" className={hideNav ? "hidden" : ""}>
+                <button className={`hideSideBar ${hideNav ? "active" : ""}`} onClick={() => { statusHideNav(!hideNav) }}>
+                    {hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : ( <i className="fa fa-chevron-left" aria-hidden="true"/>)} </button>
                 {renderSideBar}
             </div>
             <div id="Main">
                 <div id="TopBar">
                     {renderTopBar}
+                    <button id="EditMode-button" disabled={Block.buttonsDisabled} className={isAdmin ? "active" : "inActivw"}
+                            onClick={() => { statusIsAdmin(!isAdmin); }}>{isAdmin ? ("Admin") : ("User")}</button>
                 </div>
                 <div id="Content">
                     <h2>{active.name}</h2>
