@@ -1,4 +1,4 @@
-import React, {Component, useState, Fragment, useEffect} from "react";
+import React, {Component} from "react";
 import OutsideClick from "./OutsideClick";
 
 class Block extends Component {
@@ -166,7 +166,7 @@ class Block extends Component {
                     }
                 }}><i className="fa fa-plus" aria-hidden="true"/></button>
             </li>
-            {block.position !== "0" && (<li>
+            {block.position.length > 1 && (<li>
                 <button disabled={Block.buttonsDisabled} onClick={() => Block.remove(block)}><i className="fa fa-minus" aria-hidden="true"/></button>
             </li>)}
         </ul>

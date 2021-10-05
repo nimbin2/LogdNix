@@ -4,6 +4,7 @@ import './App.css';
 import Block from './components/Block'
 import Navbar from './components/Navbar'
 import OutsideClick from "./components/OutsideClick";
+import Item from "./components/Item";
 
 
 function App() {
@@ -15,9 +16,12 @@ function App() {
     const [renderSideBar, statusRenderSideBar] = useState()
     const [renderTopBar, statusRenderTopBar] = useState()
     const [renderBottomBar, statusRenderBottomBar] = useState()
+    const [reRenderItems, statusReRenderItems] = useState()
     const [buttonsDisabled, statusButtonsDisabled] = useState(false)
     const [isAdmin, statusIsAdmin] = useState(Block.isAdmin)
     const [hideNav, statusHideNav] = useState(false)
+    const [addITEM, statusAddITEM] = useState()
+    const [editITEM, statusEditITEM] = useState()
 
 
     useEffect(() => {
@@ -25,6 +29,7 @@ function App() {
         Block.statusActive = statusActive
         Block.active = active
         reRenderNavbar()
+        statusReRenderItems(Item.renderItems(active))
     }, [active])
 
     useEffect(() => {
@@ -51,7 +56,7 @@ function App() {
             document.getElementById("Content").removeEventListener('click', OutsideClick.handleOutsideClick)
         }
         return () => {
-            document.getElementById("Content").removeEventListener("click", OutsideClick.handleOutsideClick);
+            document.getElementById("Content").removeEventListener("click", OutsideClick.handleOutsideClick)
         }
     }, [outsideClickInput])
 
@@ -65,14 +70,14 @@ function App() {
         Block.isAdmin = isAdmin
         Block.statusIsAdmin = statusIsAdmin
         reRenderNavbar()
-        !isAdmin && !hideNav && OutsideClick.statusInput({id: "#Sidebar",function: () => Navbar.statusHideNav(true) })
+        !isAdmin && !hideNav && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true) })
     }, [isAdmin])
 
     useEffect(() => {
         Navbar.hideNav = hideNav
         Navbar.statusHideNav = statusHideNav
-        if (!hideNav && !isAdmin) {
-            OutsideClick.statusInput({id: "#Sidebar",function: () => Navbar.statusHideNav(true) })
+        if ( !hideNav && !isAdmin ) {
+            OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true) })
         }  else {
             OutsideClick.statusInput()
         }
@@ -81,6 +86,21 @@ function App() {
         }
     }, [hideNav])
 
+    useEffect(() => {
+        Item.editITEM = editITEM
+        Item.statusEditITEM = statusEditITEM
+        console.log("Item.editITEM.item, Item.editITEM.index")
+        console.log(Item.editITEM?.item, Item.editITEM?.index)
+        Item.editITEM && Item.renderInput(Item.editITEM?.item, Item.editITEM?.index)
+    }, [editITEM])
+
+    useEffect(() => {
+        console.log("ADD", addITEM)
+        Item.addITEM = addITEM
+        Item.statusAddITEM = statusAddITEM
+        statusReRenderItems(Item.renderItems(active))
+    }, [addITEM])
+
     Block.positionsSet(Block.options, [])
 
     const reRenderNavbar = () => {
@@ -88,7 +108,6 @@ function App() {
         statusRenderTopBar(Navbar.renderTopBar())
         statusRenderBottomBar(Navbar.renderBottomBar())
     }
-
 
 
     return (
@@ -106,6 +125,7 @@ function App() {
                 </div>
                 <div id="Content">
                     <h2>{active.name}</h2>
+                    {reRenderItems}
                 </div>
                 <div id="BottomBar">
                     {renderBottomBar}

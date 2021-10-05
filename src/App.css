@@ -105,6 +105,9 @@ textarea {
   grid-template-rows: 40px auto;
 }
 
+.hideSideBar i {
+  opacity: .16;
+}
 .hideSideBar {
   all: unset;
   cursor: pointer;
@@ -115,7 +118,6 @@ textarea {
   padding: 3px 8px;
   z-index: 1;
   color: white;
-  opacity: .16;
 }
 .hideSideBar.active {
   width: var(--width-sidebar-hidden);
@@ -123,9 +125,12 @@ textarea {
   height: 100vh;
   left: 0;
   z-index: 1;
+  opacity: 0.8;
+}
+.hideSideBar.active i {
   opacity: 0.3;
 }
-.hideSideBar:hover {
+.hideSideBar:hover i {
   opacity: 0.37;
 }
 #Sidebar {
@@ -304,10 +309,10 @@ ul.button-editBlock button {
   position: relative;
 }
 
-#EditThisItem + #EditItem {
+#EditThisItem + #EditButtonOptions {
   display: inline-block !important;
 }
-#EditItem {
+#EditButtonOptions {
   display: none !important;
 }
 #ButtonEdit {
