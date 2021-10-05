@@ -124,7 +124,7 @@ function App() {
                 <div id="TopBar">
                     {renderTopBar}
                     <div className="buttons-right">
-                        <button className="button-export" onClick={() => Block.downloadObject(Block.options, "options.ob")}>Export</button>
+                        <button className="button-export" onClick={() => Block.downloadObject(Block.options, "LogdNix.data")}>Export</button>
                         <div className="fileInput">
                             <label htmlFor="FileInput">Import</label>
                             <input id="FileInput" type="file" name="file"/>
