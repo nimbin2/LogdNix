@@ -89,17 +89,20 @@ function App() {
     useEffect(() => {
         Item.editITEM = editITEM
         Item.statusEditITEM = statusEditITEM
-        console.log("Item.editITEM.item, Item.editITEM.index")
-        console.log(Item.editITEM?.item, Item.editITEM?.index)
         Item.editITEM && Item.renderInput(Item.editITEM?.item, Item.editITEM?.index)
     }, [editITEM])
 
     useEffect(() => {
-        console.log("ADD", addITEM)
         Item.addITEM = addITEM
         Item.statusAddITEM = statusAddITEM
         statusReRenderItems(Item.renderItems(active))
     }, [addITEM])
+
+    useEffect(() => {
+        Item.reRenderItems = reRenderItems
+        Item.statusReRenderItems = statusReRenderItems
+        statusReRenderItems(Item.renderItems(active))
+    }, [reRenderItems])
 
     Block.positionsSet(Block.options, [])
 
@@ -107,8 +110,8 @@ function App() {
         statusRenderSideBar(Navbar.renderSideBar())
         statusRenderTopBar(Navbar.renderTopBar())
         statusRenderBottomBar(Navbar.renderBottomBar())
+        Block.init()
     }
-
 
     return (
         <div id="LogdNix">
@@ -120,8 +123,15 @@ function App() {
             <div id="Main">
                 <div id="TopBar">
                     {renderTopBar}
-                    <button id="EditMode-button" disabled={Block.buttonsDisabled} className={isAdmin ? "active" : "inActivw"}
-                            onClick={() => { statusIsAdmin(!isAdmin); }}>{isAdmin ? ("Admin") : ("User")}</button>
+                    <div className="buttons-right">
+                        <button className="button-export" onClick={() => Block.downloadObject(Block.options, "options.ob")}>Export</button>
+                        <div className="fileInput">
+                            <label htmlFor="FileInput">Import</label>
+                            <input id="FileInput" type="file" name="file"/>
+                        </div>
+                        <button id="EditMode-button" disabled={Block.buttonsDisabled} className={isAdmin ? "active" : "inActivw"}
+                                onClick={() => { statusIsAdmin(!isAdmin); }}>{isAdmin ? ("Admin") : ("User")}</button>
+                    </div>
                 </div>
                 <div id="Content">
                     <h2>{active.name}</h2>

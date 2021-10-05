@@ -79,6 +79,33 @@ class Block extends Component {
     static isAdmin = true
     static statusIsAdmin
 
+    static downloadObject(obj, filename){
+        let blob = new Blob([JSON.stringify(obj, null, 2)], {type: "application/json;charset=utf-8"}) //.slice(2,-1);
+        let url = URL.createObjectURL(blob);
+        let elem = document.createElement("a");
+        elem.href = url;
+        elem.download = filename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+    }
+
+    static init() {
+        document.getElementById('FileInput').addEventListener('change', Block.handleFileSelect, false);
+    }
+
+    static handleFileSelect(event) {
+        const reader = new FileReader()
+        reader.onload = Block.handleFileLoad;
+        reader.readAsText(event.target.files[0])
+    }
+
+    static handleFileLoad(event) {
+        let result = event.target.result
+        Block.options = JSON.parse(result)
+        Block.statusActive(Block.options[0])
+    }
+
     static checkPreActive = (block) => {
         return Block.active.position === block.position ?  false : Block.active.position.toString().startsWith(block.position.toString())
     }

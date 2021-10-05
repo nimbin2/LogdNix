@@ -9,6 +9,8 @@ class Item extends Component {
     static statusAddITEM
     static editITEM
     static statusEditITEM
+    static reRenderItems
+    static statusReRenderItems
 
     static setBaseItem = (block) => {
         return !block.item && Object.assign(block, {item: []})
@@ -56,7 +58,7 @@ class Item extends Component {
                     <button onClick={() => { Item.statusEditITEM({item: item, index: i})}}>bearbeiten</button>
                 </li>
                 <li>
-                    <button onClick={() => Item.remove(Block.active, item, i)}>löschen</button>
+                    <button onClick={() => {  Block.statusActive(); Item.remove(Block.active, item, i); Block.statusActive(Block.active)}}>löschen</button>
                 </li>
             </ul>
         </div>

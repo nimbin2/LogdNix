@@ -228,6 +228,33 @@ ul.button-editBlock button {
   font-size: 10px;
 }
 
+.fileInput label, .button-export {
+  all: unset;
+  position: relative;
+  display: flex;
+  height: auto;
+  padding: 13px 20px 10px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: .008em;
+  z-index: 1;
+  opacity: .4;
+}
+.fileInput label:hover, .button-export:hover {
+  opacity: .6;
+}
+
+#FileInput {
+  visibility: hidden;
+  width: 0;
+}
+
+#TopBar .buttons-right {
+  display: flex;
+}
+
 #TopBar {
   position: sticky;
   top: 0;
@@ -276,6 +303,10 @@ ul.button-editBlock button {
   grid-area: main;
   grid-template-areas: "topBar" "content" "bottomBar";
   grid-template-rows: 40px auto 33px;
+}
+#Content > * {
+  margin-left: 20px;
+  margin-right: 20px;
 }
 #Content {
   grid-area: content;
