@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import OutsideClick from "./OutsideClick";
+import Navbar from "./Navbar";
 
 class Block extends Component {
 
@@ -8,7 +9,7 @@ class Block extends Component {
         blocks: [
             {
                 name: "Mails",
-                item: [{text: "Der erste satrz"}],
+                item: [{text: "1. Der erste satrz"}, {text: "2. Der zweite satrz"}, {text: "3. Der dritte satrz"}, ],
                 blocks: [{
                     name: "FAQ"
                 }, {
@@ -78,6 +79,8 @@ class Block extends Component {
     static statusButtonsDisabled
     static isAdmin = true
     static statusIsAdmin
+    static hold
+    static statusHold
 
     static downloadObject(obj, filename){
         let blob = new Blob([JSON.stringify(obj, null, 2)], {type: "application/json;charset=utf-8"}) //.slice(2,-1);
@@ -165,6 +168,30 @@ class Block extends Component {
     static remove = (block) => {
         Block.statusActive(Block.parent(block))
         return Block.parent(block).blocks.splice(block.position.pop(), 1);
+    }
+
+    static resetHold = (block) => {
+        let hold = Block.hold
+        if (Block.hold?.indexOf(block) !== -1) {
+            hold.splice(Block.hold.indexOf(block), 1)
+            hold = [block, ...hold]
+            Block.statusHold(hold)
+        }
+        return hold
+    }
+
+    static isHold = (block) => {
+        return Block.hold?.indexOf(block) !== -1;
+    }
+
+    static toggleHold = (block) => {
+        if (Block.hold.indexOf(block) !== -1) {
+            Block.hold.splice(Block.hold.indexOf(block), 1)
+            Block.statusHold([...Block.hold])
+        } else {
+            Navbar.statusHideNav(false)
+            Block.statusHold([block, ...Block.hold])
+        }
     }
 
     static renderEditButton = (block) => Block.isAdmin && (

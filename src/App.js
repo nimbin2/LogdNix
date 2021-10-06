@@ -5,6 +5,7 @@ import Block from './components/Block'
 import Navbar from './components/Navbar'
 import OutsideClick from "./components/OutsideClick";
 import Item from "./components/Item";
+import Content from "./components/Content";
 
 
 function App() {
@@ -16,20 +17,24 @@ function App() {
     const [renderSideBar, statusRenderSideBar] = useState()
     const [renderTopBar, statusRenderTopBar] = useState()
     const [renderBottomBar, statusRenderBottomBar] = useState()
-    const [reRenderItems, statusReRenderItems] = useState()
+    const [reRenderContent, statusReRenderContent] = useState()
     const [buttonsDisabled, statusButtonsDisabled] = useState(false)
     const [isAdmin, statusIsAdmin] = useState(Block.isAdmin)
     const [hideNav, statusHideNav] = useState(false)
     const [addITEM, statusAddITEM] = useState()
     const [editITEM, statusEditITEM] = useState()
+    const [holdBlocks, statusHoldBlocks] = useState([])
 
 
     useEffect(() => {
         Block.active = active
         Block.statusActive = statusActive
         Block.active = active
+        console.log("active", active.name, Block.hold)
+        Block.hold && Block.resetHold(active)
+
         reRenderNavbar()
-        statusReRenderItems(Item.renderItems(active))
+        statusReRenderContent(Content.renderContent())
     }, [active])
 
     useEffect(() => {
@@ -41,7 +46,6 @@ function App() {
     useEffect(() => {
         Block.addBLOCK = addBLOCK
         Block.statusAddBLOCK = statusAddBLOCK
-        Block.addBLOCK = addBLOCK
         reRenderNavbar()
     }, [addBLOCK])
 
@@ -52,7 +56,6 @@ function App() {
         if (OutsideClick.input) {
             document.getElementById("Content").addEventListener('click', OutsideClick.handleOutsideClick)
         } else {
-            OutsideClick.input?.function()
             document.getElementById("Content").removeEventListener('click', OutsideClick.handleOutsideClick)
         }
         return () => {
@@ -69,40 +72,42 @@ function App() {
     useEffect(() => {
         Block.isAdmin = isAdmin
         Block.statusIsAdmin = statusIsAdmin
-        reRenderNavbar()
-        !isAdmin && !hideNav && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true) })
+        reRenderAll()
+        //!isAdmin && !Block.hideNav && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true) })
     }, [isAdmin])
 
     useEffect(() => {
         Navbar.hideNav = hideNav
         Navbar.statusHideNav = statusHideNav
-        if ( !hideNav && !isAdmin ) {
-            OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true) })
-        }  else {
-            OutsideClick.statusInput()
-        }
-        return () => {
-            OutsideClick.statusInput()
-        }
+        !hideNav && Block.isAdmin && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true) })
     }, [hideNav])
 
     useEffect(() => {
         Item.editITEM = editITEM
         Item.statusEditITEM = statusEditITEM
-        Item.editITEM && Item.renderInput(Item.editITEM?.item, Item.editITEM?.index)
+        Item.editITEM && Item.renderInput(Item.editITEM?.block, Item.editITEM?.item, Item.editITEM?.index)
     }, [editITEM])
 
     useEffect(() => {
         Item.addITEM = addITEM
         Item.statusAddITEM = statusAddITEM
-        statusReRenderItems(Item.renderItems(active))
+        statusReRenderContent(Content.renderContent())
+
     }, [addITEM])
 
     useEffect(() => {
-        Item.reRenderItems = reRenderItems
-        Item.statusReRenderItems = statusReRenderItems
-        statusReRenderItems(Item.renderItems(active))
-    }, [reRenderItems])
+        Item.reRenderContent = reRenderContent
+        Item.statusReRenderContent = statusReRenderContent
+    }, [reRenderContent])
+
+    useEffect(() => {
+        Block.hold = holdBlocks
+        Block.statusHold = statusHoldBlocks
+        statusReRenderContent(Content.renderContent())
+        if (document.getElementById("Hold")) {
+            document.getElementById("Hold").style.gridTemplateColumns = `repeat(${Block.hold.length+1}, 50%)`
+        }
+    }, [holdBlocks])
 
     Block.positionsSet(Block.options, [])
 
@@ -113,10 +118,15 @@ function App() {
         Block.init()
     }
 
+    const reRenderAll = () => {
+        reRenderNavbar()
+        statusReRenderContent(Content.renderContent())
+    }
+
     return (
         <div id="LogdNix">
             <div id="Sidebar" className={hideNav ? "hidden" : ""}>
-                <button className={`hideSideBar ${hideNav ? "active" : ""}`} onClick={() => { statusHideNav(!hideNav) }}>
+                <button disabled={Block.buttonsDisabled} className={`hideSideBar ${hideNav ? "active" : ""}`} onClick={() => { statusHideNav(!hideNav) }}>
                     {hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : ( <i className="fa fa-chevron-left" aria-hidden="true"/>)} </button>
                 {renderSideBar}
             </div>
@@ -124,18 +134,17 @@ function App() {
                 <div id="TopBar">
                     {renderTopBar}
                     <div className="buttons-right">
-                        <button className="button-export" onClick={() => Block.downloadObject(Block.options, "LogdNix.data")}>Export</button>
+                        <button disabled={Block.buttonsDisabled} className="button-export" onClick={() => Block.downloadObject(Block.options, "LogdNix.data")}>Export</button>
                         <div className="fileInput">
+                            <input disabled={Block.buttonsDisabled} id="FileInput" type="file" name="file"/>
                             <label htmlFor="FileInput">Import</label>
-                            <input id="FileInput" type="file" name="file"/>
                         </div>
                         <button id="EditMode-button" disabled={Block.buttonsDisabled} className={isAdmin ? "active" : "inActivw"}
                                 onClick={() => { statusIsAdmin(!isAdmin); }}>{isAdmin ? ("Admin") : ("User")}</button>
                     </div>
                 </div>
                 <div id="Content">
-                    <h2>{active.name}</h2>
-                    {reRenderItems}
+                    {reRenderContent}
                 </div>
                 <div id="BottomBar">
                     {renderBottomBar}

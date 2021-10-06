@@ -1,8 +1,11 @@
 import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import {Component} from "react";
+import {Component, Fragment} from "react";
 import Block from "./Block";
 import OutsideClick from "./OutsideClick";
+import { DragDropContext } from 'react-beautiful-dnd';
+import { useDrag } from 'react-dnd'
+
 
 class Item extends Component {
     static addITEM
@@ -46,16 +49,20 @@ class Item extends Component {
 
     }
 
-    static editOptions = (item, i) => {
+    static onDragEnd = () => {
+        console.log("DragEnd")
+    }
+
+    static editOptions = (block, item, i) => {
         return <div>
-            <button type="edit" className="btn btn-default" disabled={Block.buttonsDisabled}
+            <button type="edit" className="btn btn-right" disabled={Block.buttonsDisabled}
                     onClick={(e) => {
                         e.target.id = "EditThisItem";
                         OutsideClick.statusInput({ id: "EditButtonOptions", function: () => document.getElementById("EditThisItem")?.removeAttribute("id")})
                     }}>...</button>
             <ul id="EditButtonOptions" className="dropDown">
                 <li>
-                    <button onClick={() => { Item.statusEditITEM({item: item, index: i})}}>bearbeiten</button>
+                    <button onClick={() => { Item.statusEditITEM({block: block, item: item, index: i})}}>bearbeiten</button>
                 </li>
                 <li>
                     <button onClick={() => {  Block.statusActive(); Item.remove(Block.active, item, i); Block.statusActive(Block.active)}}>löschen</button>
@@ -64,55 +71,59 @@ class Item extends Component {
         </div>
     }
 
-    static renderInput = (item, i) => {
+    static renderInput = (block, item, i) => {
         Block.statusButtonsDisabled(true)
         console.log("RENDER", Item.editITEM)
 
         let input
         let itemValue
-        if (Block.active.item) {
-            for (let key in Block.active.item[i]) {
-                if (Block.active.item[i].hasOwnProperty(key)) {
-                    itemValue = Block.active.item[i][key];
+        if (block.item) {
+            for (let key in block.item[i]) {
+                if (block.item[i].hasOwnProperty(key)) {
+                    itemValue = block.item[i][key];
                 }
             }
         }
 
         Item.statusAddITEM(
-            <form className={Item.editITEM ? "editItem" : "addItem"}>
+            <form id="Active-form" className={Item.editITEM ? "editItem" : "addItem"}>
                 <CKEditor editor={ClassicEditor} data={itemValue} onChange={(e, editor) => input = editor.getData()}/>
-                <button className="btn btn-default" onClick={(e) => {
+                <button className="btn btn-default btn-green" onClick={(e) => {
                     e.preventDefault();
-                    item ? Item.editItem(Block.active, item, i, input || itemValue) :
-                        input && input.length > 0 && Item.addItem(Block.active, {text: input});
-                }}>Save
-                </button>
-                <button className="btn btn-default" onClick={() =>  Item.endInput() }>Cancel</button>
+                    item ? Item.editItem(block, item, i, input || itemValue) :
+                        input && input.length > 0 && Item.addItem(block, {text: input});
+                }}><i className="fa fa-check" aria-hidden="true"/></button>
+                <button className="btn btn-default btn-red" onClick={() =>  Item.endInput() }><i className="fa fa-close" aria-hidden="true"/></button>
             </form>
         )
     }
 
-    static renderItems = (block) => {console.log("wusa"); return <div id="Items-Main" className="items">
-        {block?.item?.map((item, i) => {
-            return (Item.editITEM && Item.editITEM.index === i) ? (
-                <div key={i} id="EditItem" className="white-card">{Item.addITEM}</div>
-            ) : (
-                <div key={i} className="item white-card">
-                    <div dangerouslySetInnerHTML={{__html: item.text}}/>
-                    <div id="ButtonEdit">
-                        {Item.editOptions(item, i)}
-                    </div>
-                </div>
-            )
-        })}
+    static renderItems = (block) => {return <div id="Items-Main" className="items">
+        <div className="button-add-container">
+            {Block.isAdmin && !Item.addITEM && (
+                <button disabled={Item.addITEM} className={`btn button-addItem ${Item.addITEM ? "d-none" : ""}`} onClick={() => {
+                    Item.renderInput(block);
+                }}><i className="fa fa-plus" aria-hidden="true"/></button>
+            )}
+        </div>
         {!Item.editITEM && Item.addITEM && (
-            <div id="AddItem" className="white-card">{Item.editITEM?.index}{Item.addITEM}</div>
+            <div id="AddItem" className="white-card add-card">{Item.editITEM?.index}{Item.addITEM}</div>
         )}
-        {Block.isAdmin && (
-            <button disabled={Item.addITEM} className={`btn btn-default ${Item.addITEM ? "d-none" : ""}`} onClick={() => {
-                Item.renderInput();
-            }}>Add Text</button>
-        )}
+        <div className="items">
+            {block?.item?.map((item, i) => {
+                    return (Item.editITEM && Item.editITEM.index === i) ? (
+                        <div key={i} id="EditItem" className="white-card add-card">{Item.addITEM}</div>
+                    ) : (
+                        <div key={i} className="item white-card">
+                            <div dangerouslySetInnerHTML={{__html: item.text}}/>
+                            <div id="ButtonEdit">
+                                {Item.editOptions(block, item, i)}
+                            </div>
+                        </div>
+                    )
+                }
+            )}
+        </div>
     </div>}
 }
 export default Item

@@ -1,9 +1,11 @@
 :root {
-  --width-sidebar-hidden: 60px;
+  --width-sidebar-hidden: 38px;
   --color-background: #2f4050;
-  --color-green: #4a8e33;
+  --color-border: #7590a9;
+  --color-green: #3e7a2a;
   --color-orange: #d7971d;
   --color-red: #ad3131;
+  --color-whiteblue: #ad3131;
 }
 body {
   background-color: #f3f3f4;
@@ -12,7 +14,36 @@ body {
   color: #676a6c;
   transition: all ease .3s;
 }
+.invisible {
+  visibility: hidden;
+}
+#LogdNix .btn {
+  border-radius: 0;
+  box-shadow: none !important;
+  outline: 0 !important;
+  border: 0;
+  border-left: 2px solid #8093a7;
+  background-color: white;
+  color: var(--color-border);
+  padding: 0;
+  width: 66px;
+  height: 30px;
+  display: inline-block;
+}
+#LogdNix .btn-right {
+  border: 0;
+  border-right: 2px solid #8093a7;
+}
+#LogdNix .btn i {
+  margin: auto;
+}
 
+.btn-red i {
+  color: var(--color-red)
+}
+.btn-green i {
+  color: var(--color-green)
+}
 
 ul.dropDown {
   position: relative;
@@ -136,7 +167,7 @@ textarea {
 #Sidebar {
   position: sticky;
   top: 0;
-  overflow: scroll;
+  overflow: auto;
   max-height: 100vh;
   grid-area: sidebar;
   background-color: var(--color-background);
@@ -177,7 +208,7 @@ textarea {
   cursor: pointer;
   color: #a7b1c2;
   font-weight: 600;
-  padding: 14px 20px 14px 25px;
+  padding: 14px 20px 14px 20px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -227,23 +258,26 @@ ul.button-editBlock button {
   padding: 0 7px;
   font-size: 10px;
 }
-
+.fileInput {
+  display: flex;
+}
 .fileInput label, .button-export {
   all: unset;
+  cursor: unset;
   position: relative;
   display: flex;
   height: auto;
   padding: 13px 20px 10px;
   font-weight: bold;
   color: white;
-  cursor: pointer;
   font-size: 12px;
   letter-spacing: .008em;
   z-index: 1;
   opacity: .4;
 }
-.fileInput label:hover, .button-export:hover {
+.fileInput input:not([disabled]) + label:hover, .button-export:not([disabled]):hover {
   opacity: .6;
+  cursor: pointer;
 }
 
 #FileInput {
@@ -269,6 +303,9 @@ ul.button-editBlock button {
 #TopBar ul, #BottomBar ul {
   all: unset;
   display: flex;
+}
+#TopBar ul li:last-child {
+  display: none;
 }
 
 #TopBar .navbarButton {
@@ -304,15 +341,25 @@ ul.button-editBlock button {
   grid-template-areas: "topBar" "content" "bottomBar";
   grid-template-rows: 40px auto 33px;
 }
-#Content > * {
+#Content {
+  grid-area: content;
+  overflow: scroll;
+}
+#Content > .content {
+  display: grid;
+}
+.content-block {
   margin-left: 20px;
   margin-right: 20px;
 }
-#Content {
-  grid-area: content;
+.content-block > .header {
+  position: relative;
+  display: inline-block;
+  padding-right: 32px;
+  margin-top: 13px;
 }
 #BottomBar {
-  overflow: scroll;
+  overflow: auto;
   grid-area: bottomBar;
   position: sticky;
   bottom: 0;
@@ -357,4 +404,74 @@ ul.button-editBlock button {
   position: absolute;
   right: 0;
   top: 0;
+}
+
+.holding-nav ul {
+  background-color: var(--color-orange);
+  display: flex;
+  list-style: none !important;
+  padding: 0 0 0 18px;
+  margin: 0;
+}
+
+.holding-nav li button {
+  all: unset;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 8px 3px;
+  cursor: pointer;
+}
+.holding-nav li button[disabled] {
+  opacity: .68;
+  cursor: unset;
+}
+.holding-nav li button:not([disabled]):hover {
+  opacity: .68;
+}
+
+.button-hold {
+  all: unset;
+  cursor: pointer;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  transition: all ease-in .06s;
+}
+
+.button-hold.active {
+  color: var(--color-green)
+}
+.button-hold.active:hover {
+
+}
+.button-hold h2 {
+  margin: 0;
+}
+
+.add-card {
+  background-color: transparent;
+  padding: 0;
+}
+
+.ck-toolbar button {
+  cursor: pointer !important;
+}
+.ck-toolbar {
+  border:0 !important;
+  background-color: white !important;
+}
+
+.ck-content {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  border-top: 2px solid var(--color-border) !important;
+  border-bottom: 2px solid var(--color-border) !important;
+}
+
+#Items-Main .button-addItem {
+  margin-bottom: 25px;
+}
+#Items-Main .items {
+  display: flex;
+  flex-direction: column-reverse;
 }
