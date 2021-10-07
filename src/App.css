@@ -28,7 +28,7 @@ body {
   padding: 0;
   width: 66px;
   height: 30px;
-  display: inline-block;
+  display: flex;
 }
 #LogdNix .btn-right {
   border: 0;
@@ -404,8 +404,13 @@ ul.button-editBlock button {
   position: absolute;
   right: 0;
   top: 0;
+  background-color: #ffffff4a;
 }
 
+.holding-nav {
+  position: sticky;
+  left: 0;
+}
 .holding-nav ul {
   background-color: var(--color-orange);
   display: flex;
@@ -474,4 +479,19 @@ ul.button-editBlock button {
 #Items-Main .items {
   display: flex;
   flex-direction: column-reverse;
+}
+
+.buttons-container {
+  display: flex;
+}
+
+.date-container .date:nth-child(2) {
+  margin-left: 12px;
+}
+.date-container {
+  position: absolute;
+  right: 2px;
+  bottom: 0;
+  font-size: 0.8rem;
+  display: flex;
 }

@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import OutsideClick from "./OutsideClick";
 import Navbar from "./Navbar";
+import moment from "moment";
 
 class Block extends Component {
 
@@ -9,7 +10,7 @@ class Block extends Component {
         blocks: [
             {
                 name: "Mails",
-                item: [{text: "1. Der erste satrz"}, {text: "2. Der zweite satrz"}, {text: "3. Der dritte satrz"}, ],
+                item: [{text: "1. Der erste satrz", date: "19870723154920"}, {text: "2. Der zweite satrz", date: "19870723154920"}, {text: "3. Der dritte satrz", date: "19870723154920"} ],
                 blocks: [{
                     name: "FAQ"
                 }, {
@@ -81,6 +82,10 @@ class Block extends Component {
     static statusIsAdmin
     static hold
     static statusHold
+    static holdLayout = true
+    static statusHoldLayout
+    static reRender = false
+    static statusReRender
 
     static downloadObject(obj, filename){
         let blob = new Blob([JSON.stringify(obj, null, 2)], {type: "application/json;charset=utf-8"}) //.slice(2,-1);
@@ -95,6 +100,14 @@ class Block extends Component {
 
     static init() {
         document.getElementById('FileInput').addEventListener('change', Block.handleFileSelect, false);
+    }
+
+    static setDate(date) {
+        return moment().format('YYYYMMDDhhmmss')
+    }
+
+    static getDate(date) {
+        return moment(date, 'YYYYMMDDhhmmss').format("DD.MM.YY, hh:mm")
     }
 
     static handleFileSelect(event) {

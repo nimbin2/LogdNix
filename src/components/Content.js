@@ -32,6 +32,9 @@ class Content extends Component {
                                 }}>{block.name}</button>
                         </li>
                     })}
+                    {Block.hold?.length > 0 && (
+                        <li><button onClick={() => Block.statusHoldLayout(!Block.holdLayout)}>{Block.holdLayout ? "50%" : "100%"}</button></li>
+                    )}
                 </ul>
             </div>
             <div id="Hold" className="content">

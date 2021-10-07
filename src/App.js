@@ -24,29 +24,29 @@ function App() {
     const [addITEM, statusAddITEM] = useState()
     const [editITEM, statusEditITEM] = useState()
     const [holdBlocks, statusHoldBlocks] = useState([])
+    const [holdLayout, statusHoldLayout] = useState([])
+    const [reRender, statusReRender] = useState(Block.reRender)
 
 
     useEffect(() => {
         Block.active = active
         Block.statusActive = statusActive
         Block.active = active
-        console.log("active", active.name, Block.hold)
         Block.hold && Block.resetHold(active)
 
-        reRenderNavbar()
-        statusReRenderContent(Content.renderContent())
+        reRenderAll()
     }, [active])
 
     useEffect(() => {
         Block.editBLOCK = editBLOCK
         Block.statusEditBLOCK = statusEditBLOCK
-        reRenderNavbar()
+        reRenderAll()
     }, [editBLOCK])
 
     useEffect(() => {
         Block.addBLOCK = addBLOCK
         Block.statusAddBLOCK = statusAddBLOCK
-        reRenderNavbar()
+        reRenderAll()
     }, [addBLOCK])
 
     useEffect(() => {
@@ -54,19 +54,19 @@ function App() {
         OutsideClick.statusInput = statusOutsideClickInput
 
         if (OutsideClick.input) {
-            document.getElementById("Content").addEventListener('click', OutsideClick.handleOutsideClick)
+            document.getElementById("Content")?.addEventListener('click', OutsideClick.handleOutsideClick)
         } else {
-            document.getElementById("Content").removeEventListener('click', OutsideClick.handleOutsideClick)
+            document.getElementById("Content")?.removeEventListener('click', OutsideClick.handleOutsideClick)
         }
         return () => {
-            document.getElementById("Content").removeEventListener("click", OutsideClick.handleOutsideClick)
+            document.getElementById("Content")?.removeEventListener("click", OutsideClick.handleOutsideClick)
         }
     }, [outsideClickInput])
 
     useEffect(() => {
         Block.buttonsDisabled = buttonsDisabled
         Block.statusButtonsDisabled = statusButtonsDisabled
-        reRenderNavbar()
+        reRenderAll()
     }, [buttonsDisabled])
 
     useEffect(() => {
@@ -85,6 +85,7 @@ function App() {
     useEffect(() => {
         Item.editITEM = editITEM
         Item.statusEditITEM = statusEditITEM
+        console.log(Item.editITEM?.block, Item.editITEM?.item, Item.editITEM?.index)
         Item.editITEM && Item.renderInput(Item.editITEM?.block, Item.editITEM?.item, Item.editITEM?.index)
     }, [editITEM])
 
@@ -104,10 +105,21 @@ function App() {
         Block.hold = holdBlocks
         Block.statusHold = statusHoldBlocks
         statusReRenderContent(Content.renderContent())
-        if (document.getElementById("Hold")) {
-            document.getElementById("Hold").style.gridTemplateColumns = `repeat(${Block.hold.length+1}, 50%)`
-        }
+        setHoldLayout()
     }, [holdBlocks])
+
+    useEffect(() => {
+        Block.holdLayout = holdLayout
+        Block.statusHoldLayout = statusHoldLayout
+        statusReRenderContent(Content.renderContent())
+        setHoldLayout()
+    }, [holdLayout])
+
+    useEffect(() => {
+        Block.reRender = reRender
+        Block.statusReRender = statusReRender
+        reRenderAll()
+    }, [reRender])
 
     Block.positionsSet(Block.options, [])
 
@@ -121,6 +133,13 @@ function App() {
     const reRenderAll = () => {
         reRenderNavbar()
         statusReRenderContent(Content.renderContent())
+        document.getElementById("Hold")?.scrollIntoView()
+    }
+
+    const setHoldLayout = () => {
+        if (document.getElementById("Hold")) {
+            document.getElementById("Hold").style.gridTemplateColumns = `repeat(${Block.hold.length+1}, ${Block.holdLayout ? "50%" : "100%"})`
+        }
     }
 
     return (
