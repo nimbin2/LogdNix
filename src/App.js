@@ -6,6 +6,9 @@ import Navbar from './components/Navbar'
 import OutsideClick from "./components/OutsideClick";
 import Item from "./components/Item";
 import Content from "./components/Content";
+import Hold from "./components/Hold";
+import RenderBlock from "./components/RenderBlock";
+import NewestPosts from "./components/NewestPosts";
 
 
 function App() {
@@ -25,67 +28,68 @@ function App() {
     const [editITEM, statusEditITEM] = useState()
     const [holdBlocks, statusHoldBlocks] = useState([])
     const [holdLayout, statusHoldLayout] = useState([])
-    const [reRender, statusReRender] = useState(Block.reRender)
+    const [reRender, statusReRender] = useState(RenderBlock.reRender)
+    const [editorInput, statusEditorInput] = useState()
+    const [hideNewest, statusHideNewest] = useState()
 
-
+    RenderBlock.statusReRender = statusReRender
     useEffect(() => {
         Block.active = active
         Block.statusActive = statusActive
         Block.active = active
-        Block.hold && Block.resetHold(active)
-
-        reRenderAll()
+        RenderBlock.statusReRender(!RenderBlock.reRender)
+        Hold.hold && Hold.resetHold(active)
     }, [active])
 
     useEffect(() => {
         Block.editBLOCK = editBLOCK
         Block.statusEditBLOCK = statusEditBLOCK
-        reRenderAll()
+        RenderBlock.statusReRender(!RenderBlock.reRender)
     }, [editBLOCK])
 
     useEffect(() => {
         Block.addBLOCK = addBLOCK
         Block.statusAddBLOCK = statusAddBLOCK
-        reRenderAll()
+        RenderBlock.statusReRender(!RenderBlock.reRender)
     }, [addBLOCK])
 
     useEffect(() => {
         OutsideClick.input = outsideClickInput
         OutsideClick.statusInput = statusOutsideClickInput
+        let mainId = OutsideClick.input?.mainId ? OutsideClick.input.mainId  : "LogdNix"
 
         if (OutsideClick.input) {
-            document.getElementById("Content")?.addEventListener('click', OutsideClick.handleOutsideClick)
+            document.getElementById(mainId)?.addEventListener('click', OutsideClick.handleOutsideClick)
         } else {
-            document.getElementById("Content")?.removeEventListener('click', OutsideClick.handleOutsideClick)
+            document.getElementById(mainId)?.removeEventListener('click', OutsideClick.handleOutsideClick)
         }
         return () => {
-            document.getElementById("Content")?.removeEventListener("click", OutsideClick.handleOutsideClick)
+            document.getElementById(mainId)?.removeEventListener("click", OutsideClick.handleOutsideClick)
         }
     }, [outsideClickInput])
 
     useEffect(() => {
         Block.buttonsDisabled = buttonsDisabled
         Block.statusButtonsDisabled = statusButtonsDisabled
-        reRenderAll()
+        RenderBlock.statusReRender(!RenderBlock.reRender)
     }, [buttonsDisabled])
 
     useEffect(() => {
         Block.isAdmin = isAdmin
         Block.statusIsAdmin = statusIsAdmin
-        reRenderAll()
-        //!isAdmin && !Block.hideNav && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true) })
+        RenderBlock.statusReRender(!RenderBlock.reRender)
+        !isAdmin && !Block.hideNav && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true), mainId: "Content" })
     }, [isAdmin])
 
     useEffect(() => {
         Navbar.hideNav = hideNav
         Navbar.statusHideNav = statusHideNav
-        !hideNav && Block.isAdmin && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true) })
+        !hideNav && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true), mainId: "Content" })
     }, [hideNav])
 
     useEffect(() => {
         Item.editITEM = editITEM
         Item.statusEditITEM = statusEditITEM
-        console.log(Item.editITEM?.block, Item.editITEM?.item, Item.editITEM?.index)
         Item.editITEM && Item.renderInput(Item.editITEM?.block, Item.editITEM?.item, Item.editITEM?.index)
     }, [editITEM])
 
@@ -93,33 +97,47 @@ function App() {
         Item.addITEM = addITEM
         Item.statusAddITEM = statusAddITEM
         statusReRenderContent(Content.renderContent())
-
     }, [addITEM])
 
     useEffect(() => {
         Item.reRenderContent = reRenderContent
         Item.statusReRenderContent = statusReRenderContent
-    }, [reRenderContent])
+        addITEM && document.getElementById("Active-form")?.getElementsByClassName("ck-editor__main").length < 1 && Item.createEditor(editITEM?.item.text)
+    }, [reRenderContent, addITEM, editITEM])
 
     useEffect(() => {
-        Block.hold = holdBlocks
-        Block.statusHold = statusHoldBlocks
+        Hold.hold = holdBlocks
+        Hold.statusHold = statusHoldBlocks
         statusReRenderContent(Content.renderContent())
         setHoldLayout()
     }, [holdBlocks])
 
     useEffect(() => {
-        Block.holdLayout = holdLayout
-        Block.statusHoldLayout = statusHoldLayout
+        Hold.holdLayout = holdLayout
+        Hold.statusHoldLayout = statusHoldLayout
         statusReRenderContent(Content.renderContent())
         setHoldLayout()
     }, [holdLayout])
 
     useEffect(() => {
-        Block.reRender = reRender
-        Block.statusReRender = statusReRender
-        reRenderAll()
+        RenderBlock.reRender = reRender
+        RenderBlock.statusReRender = statusReRender
+        reRenderNavbar()
+        statusReRenderContent(Content.renderContent())
+        document.getElementById("Hold")?.scrollIntoView()
     }, [reRender])
+
+    useEffect(() => {
+        Item.editorInput = editorInput
+        Item.statusEditorInput = statusEditorInput
+    }, [editorInput])
+
+    useEffect(() => {
+        NewestPosts.hideNewest = hideNewest
+        NewestPosts.statusHideNewest = statusHideNewest
+        statusReRenderContent(Content.renderContent())
+    }, [hideNewest])
+
 
     Block.positionsSet(Block.options, [])
 
@@ -130,17 +148,18 @@ function App() {
         Block.init()
     }
 
-    const reRenderAll = () => {
-        reRenderNavbar()
-        statusReRenderContent(Content.renderContent())
-        document.getElementById("Hold")?.scrollIntoView()
-    }
-
     const setHoldLayout = () => {
         if (document.getElementById("Hold")) {
-            document.getElementById("Hold").style.gridTemplateColumns = `repeat(${Block.hold.length+1}, ${Block.holdLayout ? "50%" : "100%"})`
+            if (!Hold.hold?.length > 0) {
+                document.getElementById("Hold").style.gridTemplateColumns = "unset"
+            } else {
+                document.getElementById("Hold").style.gridTemplateColumns = `repeat(${Hold.hold.length+1}, ${Hold.holdLayout ? "50%" : "100%"})`
+            }
         }
     }
+
+    useEffect(() => {
+    })
 
     return (
         <div id="LogdNix">

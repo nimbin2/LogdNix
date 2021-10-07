@@ -1,7 +1,8 @@
-import React, {Component} from "react";
-import OutsideClick from "./OutsideClick";
-import Navbar from "./Navbar";
+import {Component} from "react";
 import moment from "moment";
+import OutsideClick from "./OutsideClick";
+import NewestPosts from "./NewestPosts";
+import Navbar from "./Navbar";
 
 class Block extends Component {
 
@@ -10,7 +11,7 @@ class Block extends Component {
         blocks: [
             {
                 name: "Mails",
-                item: [{text: "1. Der erste satrz", date: "19870723154920"}, {text: "2. Der zweite satrz", date: "19870723154920"}, {text: "3. Der dritte satrz", date: "19870723154920"} ],
+                item: [{text: "1. Der erste satrz", date: "20211006132222"}, {text: "2. Der zweite satrz", date: "20211006135222"}, {text: "3. Der dritte satrz", date: "19870723154920"} ],
                 blocks: [{
                     name: "FAQ"
                 }, {
@@ -70,7 +71,7 @@ class Block extends Component {
                 name: "Ordner"
             }]
     }]
-    static active = Block.options[0]
+    static active = this.options[0]
     static statusActive
     static editBLOCK
     static statusEditBLOCK
@@ -80,12 +81,6 @@ class Block extends Component {
     static statusButtonsDisabled
     static isAdmin = true
     static statusIsAdmin
-    static hold
-    static statusHold
-    static holdLayout = true
-    static statusHoldLayout
-    static reRender = false
-    static statusReRender
 
     static downloadObject(obj, filename){
         let blob = new Blob([JSON.stringify(obj, null, 2)], {type: "application/json;charset=utf-8"}) //.slice(2,-1);
@@ -98,36 +93,57 @@ class Block extends Component {
         document.body.removeChild(elem);
     }
 
+    static initListener = (e) => {
+        if (document.getElementById("Hold") && document.getElementById("Hold").contains(e.target)) {
+            document.getElementById("Hold")?.removeEventListener('click', Block.initListener)
+            NewestPosts.statusHideNewest(true)
+        }
+    }
+
     static init() {
-        document.getElementById('FileInput').addEventListener('change', Block.handleFileSelect, false);
+        document.getElementById('FileInput').addEventListener('change', this.handleFileSelect, false);
+        document.getElementById("Hold")?.addEventListener('click', Block.initListener)
     }
 
     static setDate(date) {
-        return moment().format('YYYYMMDDhhmmss')
+        return moment(date).format('YYYYMMDDHHmmss')
     }
 
+    static formatDate(date) {
+        return moment(date, 'YYYYMMDDhhmmss')
+    }
+
+    static checkDateToday(date) {
+        return this.formatDate(date).isSame(new Date(), "day")
+    }
+    static checkDateYesterday(date) {
+        return this.formatDate(date).isSame(moment(new Date()).subtract(1, 'days'), "day")
+    }
     static getDate(date) {
-        return moment(date, 'YYYYMMDDhhmmss').format("DD.MM.YY, hh:mm")
+        let isToday
+        this.checkDateToday(date) ? isToday = "heute," : (this.checkDateYesterday(date) ? isToday = "gestern, " : isToday = "DD.MM.YY,")
+        return this.checkDateToday(date) || this.checkDateYesterday(date) ? isToday + this.formatDate(date).format(` HH:mm`) : this.formatDate(date).format(`${isToday}, HH:mm`)
+
     }
 
     static handleFileSelect(event) {
         const reader = new FileReader()
-        reader.onload = Block.handleFileLoad;
+        reader.onload = this.handleFileLoad;
         reader.readAsText(event.target.files[0])
     }
 
     static handleFileLoad(event) {
         let result = event.target.result
-        Block.options = JSON.parse(result)
-        Block.statusActive(Block.options[0])
+        this.options = JSON.parse(result)
+        this.statusActive(this.options[0])
     }
 
     static checkPreActive = (block) => {
-        return Block.active.position === block.position ?  false : Block.active.position.toString().startsWith(block.position.toString())
+        return this.active.position === block.position ?  false : this.active.position.toString().startsWith(block.position.toString())
     }
 
     static checkActive = (block) => {
-        return Block.active.position === block.position
+        return this.active.position === block.position
     }
 
     static position = (block) => {
@@ -139,36 +155,48 @@ class Block extends Component {
 
     static positionsSet = (blocks, position) => {
         blocks.forEach((block, i) => {
-            Block.positionSet(block, [...position, i])
-            block.blocks && Block.positionsSet(block.blocks, [...position, i])
+            this.positionSet(block, [...position, i])
+            block.blocks && this.positionsSet(block.blocks, [...position, i])
         })
+    }
+
+    static all = () => {
+        let allBlocks = []
+        const getBlocks = (blocks) => {
+            blocks.forEach((block) => {
+                allBlocks = [...allBlocks, block]
+                block.blocks && getBlocks(block.blocks)
+            })
+        }
+        getBlocks(this.options)
+        return allBlocks
     }
 
     static parents = (block) => {
         let blocks = []
         block.position.forEach((i, c) => {
-            block = c === 0 ? Block.options[0] : block.blocks[i]
+            block = c === 0 ? this.options[0] : block.blocks[i]
             blocks = [...blocks, block]
         })
         return blocks
     }
 
     static parent = (block) => {
-        return Block.parents(block).reverse()[1]
+        return this.parents(block).reverse()[1]
     }
 
 
     static add = (block, name) => {
         !block.blocks && Object.assign(block, {blocks: []})
         block.blocks.unshift({name: name})
-        Block.positionsSet(block.blocks, block.position)
+        this.positionsSet(block.blocks, block.position)
         return block
     }
 
     static get = (position) => {
         let block
         position.forEach((i, c) => {
-            block = c === 0 ? Block.options[0] : block.blocks[i]
+            block = c === 0 ? this.options[0] : block.blocks[i]
         })
         return block
     }
@@ -179,109 +207,9 @@ class Block extends Component {
     }
 
     static remove = (block) => {
-        Block.statusActive(Block.parent(block))
-        return Block.parent(block).blocks.splice(block.position.pop(), 1);
+        this.statusActive(this.parent(block))
+        return this.parent(block).blocks.splice(block.position.pop(), 1);
     }
-
-    static resetHold = (block) => {
-        let hold = Block.hold
-        if (Block.hold?.indexOf(block) !== -1) {
-            hold.splice(Block.hold.indexOf(block), 1)
-            hold = [block, ...hold]
-            Block.statusHold(hold)
-        }
-        return hold
-    }
-
-    static isHold = (block) => {
-        return Block.hold?.indexOf(block) !== -1;
-    }
-
-    static toggleHold = (block) => {
-        if (Block.hold.indexOf(block) !== -1) {
-            Block.hold.splice(Block.hold.indexOf(block), 1)
-            Block.statusHold([...Block.hold])
-        } else {
-            Navbar.statusHideNav(false)
-            Block.statusHold([block, ...Block.hold])
-        }
-    }
-
-    static renderEditButton = (block) => Block.isAdmin && (
-        <ul className="button-editBlock dropDown">
-            <li>
-                <button disabled={Block.buttonsDisabled && Block.buttonsDisabled !== "editBlock"} onClick={() => {
-                    if (Block.editBLOCK?.name) {
-                        Block.endRenderEdit()
-                    } else {
-                        Block.statusEditBLOCK(block)
-                        Block.statusButtonsDisabled("editBlock")
-                        OutsideClick.statusInput({id: "EditBlock",function: () => Block.endRenderEdit() })
-                    }
-                }}><i className="fa fa-pencil" aria-hidden="true"/></button>
-            </li>
-            <li>
-                <button disabled={Block.buttonsDisabled && Block.buttonsDisabled !== "addBlock"} onClick={() => {
-                    if (Block.addBLOCK?.name) {
-                        Block.statusAddBLOCK()
-                        Block.statusButtonsDisabled()
-                        Block.endRenderAdd()
-                    } else {
-                        Block.statusAddBLOCK(block)
-                        Block.statusButtonsDisabled("addBlock")
-                        OutsideClick.statusInput({id: "EditBlock",function: () => Block.endRenderAdd() })
-                    }
-                }}><i className="fa fa-plus" aria-hidden="true"/></button>
-            </li>
-            {block.position.length > 1 && (<li>
-                <button disabled={Block.buttonsDisabled} onClick={() => Block.remove(block)}><i className="fa fa-minus" aria-hidden="true"/></button>
-            </li>)}
-        </ul>
-    )
-
-    static endRenderAdd = () => {
-        Block.statusAddBLOCK()
-        Block.statusButtonsDisabled()
-        OutsideClick.statusInput()
-    }
-    static renderAddBlock = (block) => {
-        let input
-        return <form id="EditBlock">
-            <input type="text" autoFocus value={input} onChange={(e) => input = e.target.value}/>
-            <button disabled={Block.buttonsDisabled && Block.buttonsDisabled !== "addBlock"} onClick={(e) => {
-                e.preventDefault()
-                let addBlock = Block.add(block, input)
-                Block.statusActive(Block.get([...addBlock.position, 0]))
-                Block.endRenderAdd()
-            }}><i className="fa fa-check" aria-hidden="true"/></button>
-            <button onClick={(e) => {
-                e.preventDefault()
-                Block.endRenderAdd()
-            }}><i className="fa fa-close" aria-hidden="true"/></button>
-        </form>
-    }
-
-    static endRenderEdit = () => {
-        Block.statusEditBLOCK()
-        Block.statusButtonsDisabled()
-        OutsideClick.statusInput()
-    }
-    static renderEditName = (block) => {
-        let input
-        return <form id="EditBlock">
-            <input type="text" autoFocus defaultValue={block.name} onChange={e => input = e.target.value}/>
-            <button disabled={Block.buttonsDisabled && Block.buttonsDisabled !== "editBlock"} onClick={(e) => {
-                e.preventDefault()
-                Block.statusActive(Block.edit(block, input && !input.startsWith(" ") ? input : block.name))
-                Block.endRenderEdit()
-            }}><i className="fa fa-check" aria-hidden="true"/></button>
-            <button onClick={(e) => {
-                e.preventDefault()
-                Block.endRenderEdit()
-            }}><i className="fa fa-close" aria-hidden="true"/></button>
-        </form>
-    }
-
 }
 
 export default Block;

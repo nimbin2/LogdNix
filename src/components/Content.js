@@ -1,14 +1,16 @@
 import {Component, Fragment} from "react";
 import Item from "./Item";
 import Block from "./Block";
+import Hold from "./Hold";
+import NewestPosts from "./NewestPosts";
 
 class Content extends Component {
 
     static content = (block) => {
         return <div key={block.position} className="content-block">
             <div className="header">
-                <button disabled={Block.buttonsDisabled} className={`button-hold ${Block.isHold(block) ? "active" : "inactive"} `} onClick={() => {
-                    Block.toggleHold(block)}}>
+                <button disabled={Block.buttonsDisabled} className={`button-hold ${Hold.isHold(block) ? "active" : "inactive"} `} onClick={() => {
+                    Hold.toggleHold(block)}}>
                     <h2>{block.name}</h2>
                 </button>
             </div>
@@ -21,30 +23,31 @@ class Content extends Component {
         <Fragment>
             <div className="holding-nav">
                 <ul>
-                    {Block.hold?.map((block, i) => {
+                    {Hold.hold?.map((block, i) => {
                         return <li key={i}>
                             <button disabled={Block.buttonsDisabled || Block.active === block}
                                 onClick={() => {
-                                    let hold = Block.hold
-                                    !Block.isHold(Block.active) && hold.splice(hold.indexOf(block), 1)
-                                    !Block.isHold(Block.active) && Block.statusHold([block, Block.active, ...hold])
+                                    let hold = Hold.hold
+                                    !Hold.isHold(Block.active) && hold.splice(hold.indexOf(block), 1)
+                                    !Hold.isHold(Block.active) && Hold.statusHold([block, Block.active, ...hold])
                                     Block.statusActive(block)
                                 }}>{block.name}</button>
                         </li>
                     })}
-                    {Block.hold?.length > 0 && (
-                        <li><button onClick={() => Block.statusHoldLayout(!Block.holdLayout)}>{Block.holdLayout ? "50%" : "100%"}</button></li>
+                    {Hold.hold?.length > 0 && (
+                        <li><button onClick={() => Hold.statusHoldLayout(!Hold.holdLayout)}>{Hold.holdLayout ? "50%" : "100%"}</button></li>
                     )}
                 </ul>
             </div>
             <div id="Hold" className="content">
-                {Content.content(Block.active)}
-                {Block.hold?.map((block, i) => {
+                {this.content(Block.active)}
+                {Hold.hold?.map((block, i) => {
                     return Block.active !== block &&  <Fragment key={i}>
-                        {Content.content(block)}
+                        {this.content(block)}
                     </Fragment>
                 })}
             </div>
+            {NewestPosts.renderNewestItems()}
         </Fragment>
     )
 }
