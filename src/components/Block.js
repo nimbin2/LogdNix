@@ -1,8 +1,6 @@
 import {Component} from "react";
 import moment from "moment";
-import OutsideClick from "./OutsideClick";
 import NewestPosts from "./NewestPosts";
-import Navbar from "./Navbar";
 
 class Block extends Component {
 
@@ -36,7 +34,8 @@ class Block extends Component {
                         name: "Fenster",
                         blocks: [
                             {
-                                name: "Check-In Pre"
+                                name: "Check-In Pre",
+                                item: [{text: "ITEM aiuwdsa sda sd asid ", date: "20240723154920"} ]
                             }, {
                                 name: "Check-In Runner-Zettel"
                             }, {
@@ -71,7 +70,8 @@ class Block extends Component {
                 name: "Ordner"
             }]
     }]
-    static active = this.options[0]
+    //static active = this.options[0]
+    static active = this.options[0].blocks[1].blocks[1]
     static statusActive
     static editBLOCK
     static statusEditBLOCK
@@ -103,6 +103,7 @@ class Block extends Component {
     static init() {
         document.getElementById('FileInput').addEventListener('change', this.handleFileSelect, false);
         document.getElementById("Hold")?.addEventListener('click', Block.initListener)
+        document.getElementById("SideBar").getElementsByClassName("active")[0]?.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"})
     }
 
     static setDate(date) {

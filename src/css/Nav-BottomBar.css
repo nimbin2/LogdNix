@@ -1,0 +1,17 @@
+#BottomBar {
+    overflow: auto;
+    grid-area: bottomBar;
+    position: sticky;
+    bottom: 0;
+    background-color: var(--color-background);
+}
+#BottomBar ul {
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+#BottomBar button {
+    padding-top: 8px;
+    padding-bottom: 3px;
+    min-width: max-content;
+}

@@ -1,0 +1,40 @@
+
+#TopBar .buttons-right {
+    display: flex;
+}
+
+#TopBar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    grid-area: topBar;
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--color-background);
+}
+#TopBar li, #BottomBar li {
+    list-style: none;
+}
+#TopBar ul, #BottomBar ul {
+    all: unset;
+    display: flex;
+}
+#TopBar .items {
+    position: relative;
+    width: 100%;
+}
+#TopBar .items >ul {
+    position: absolute;
+    width: 100%;
+    overflow: auto;
+    display: flex;
+}
+#TopBar ul li:last-child {
+    display: none;
+}
+
+#TopBar .navbarButton {
+    padding-bottom: 7px !important;
+    padding-top: 10px !important;
+    white-space: nowrap;
+}

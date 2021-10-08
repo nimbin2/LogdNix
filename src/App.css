@@ -1,12 +1,16 @@
 :root {
-  --width-sidebar-hidden: 38px;
   --color-background: #2f4050;
   --color-border: #7590a9;
   --color-green: #3e7a2a;
   --color-orange: #d7971d;
   --color-red: #ad3131;
   --color-whitegray: #f3f3f4;
+  --sm: 600px;
+  --md: 900px;
+  --lg: 1200px;
+  --xl: 1800px;
 }
+
 body {
   background-color: var(--color-whitegray);
   font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
@@ -153,111 +157,6 @@ textarea {
 
 
 
-#LogdNix {
-  min-height: 100vh;
-  display: grid;
-  grid-template-areas: "sidebar main" "sidebar main";
-  grid-template-columns: auto 1fr;
-  grid-template-rows: 40px auto;
-}
-
-.hideSideBar i {
-  opacity: .16;
-}
-.hideSideBar {
-  all: unset;
-  cursor: pointer;
-  position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 32px;
-  padding: 3px 8px;
-  z-index: 1;
-  color: white;
-}
-.hideSideBar.active {
-  width: var(--width-sidebar-hidden);
-  background-color: var(--color-background);
-  height: 100vh;
-  left: 0;
-  z-index: 1;
-  opacity: 0.8;
-}
-.hideSideBar.active i {
-  opacity: 0.3;
-}
-.hideSideBar:hover i {
-  opacity: 0.37;
-}
-#Sidebar {
-  position: sticky;
-  top: 0;
-  overflow: auto;
-  max-height: 100vh;
-  grid-area: sidebar;
-  background-color: var(--color-background);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-#Sidebar >ul {
-  float: right;
-  padding-left: 0;
-  margin-top: 39px;
-}
-
-#Sidebar ul.button-editBlock {
-  display: flex !important;
-
-}
-
-#Sidebar.hidden {
-  width: var(--width-sidebar-hidden);
-  overflow: hidden;
-}
-#Sidebar .navbarButton.active[disabled] + .button-editBlock {
-  display: flex !important;
-}
-#Sidebar .navbarButton.preActive {
-  color: #fff;
-  background-color: var(--color-red) !important;
-  opacity: .78;
-}
-#Sidebar .navbarButton.active {
-  color: #fff;
-  background-color: var(--color-green) !important;
-  opacity: .78;
-}
-.navbarButton {
-  all: unset;
-  cursor: pointer;
-  color: #a7b1c2;
-  font-weight: 600;
-  padding: 14px 20px 14px 20px;
-  width: 100%;
-  box-sizing: border-box;
-}
-.navbarButton:not([disabled]):hover {
-  background-color: #293846;
-  color: #fff;
-}
-.navbarButton:not([disabled]):focus {
-  outline: 5px auto -webkit-focus-ring-color;
-  outline-offset: -2px;
-}
-.navbarButton[disabled] {
-  cursor: unset;
-}
-.navBlock {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-.navBlock li {
-  list-style: none;
-}
-
 ul.button-editBlock {
   display: none !important;
   background-color: transparent;
@@ -274,9 +173,6 @@ ul.button-editBlock button[disabled] {
 }
 ul.button-editBlock button:not[disabled]:hover {
   color: var(--color-green);
-}
-.navItem {
-  position: relative;
 }
 
 ul.button-editBlock button {
@@ -311,44 +207,6 @@ ul.button-editBlock button {
   width: 0;
 }
 
-#TopBar .buttons-right {
-  display: flex;
-}
-
-#TopBar {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  grid-area: topBar;
-  display: flex;
-  justify-content: space-between;
-  background-color: var(--color-background);
-}
-#TopBar li, #BottomBar li {
-  list-style: none;
-}
-#TopBar ul, #BottomBar ul {
-  all: unset;
-  display: flex;
-}
-#TopBar .items {
-  position: relative;
-  width: 100%;
-}
-#TopBar .items >ul {
-  position: absolute;
-  width: 100%;
-  overflow: auto;
-}
-#TopBar ul li:last-child {
-  display: none;
-}
-
-#TopBar .navbarButton {
-  padding-bottom: 7px !important;
-  padding-top: 10px !important;
-  white-space: nowrap;
-}
 #EditMode-button {
   position: relative;
   all: unset;
@@ -372,24 +230,15 @@ ul.button-editBlock button {
   background-color: var(--color-orange);
   color: var(--color-background);
 }
-#Main {
-  display: grid;
-  grid-area: main;
-  grid-template-areas: "topBar" "content" "bottomBar";
-  grid-template-rows: 40px auto 33px;
-}
 #Content {
   grid-area: content;
-  overflow: scroll;
+  overflow: auto;
   display: grid;
   grid-template-areas: "holdNav" "hold" "newestItems";
   grid-template-rows: 25px 1fr;
 }
 #Content > .content {
   display: grid;
-}
-#Hold {
-  grid-area: hold;
 }
 .content-block {
   border-right: 1px solid var(--color-background);
@@ -401,23 +250,6 @@ ul.button-editBlock button {
   display: inline-block;
   padding-right: 32px;
   margin-top: 13px;
-}
-#BottomBar {
-  overflow: auto;
-  grid-area: bottomBar;
-  position: sticky;
-  bottom: 0;
-  background-color: var(--color-background);
-}
-#BottomBar ul {
-  display: flex;
-  padding: 0;
-  margin: 0;
-}
-#BottomBar button {
-  padding-top: 8px;
-  padding-bottom: 3px;
-  min-width: max-content;
 }
 
 .col {
@@ -449,52 +281,6 @@ ul.button-editBlock button {
   right: 0;
   top: 0;
   background-color: #ffffff4a;
-}
-
-.holding-nav {
-  position: sticky;
-  left: 0;
-  border-right: 1px solid var(--color-background);
-}
-.holding-nav ul {
-  background-color: var(--color-orange);
-  display: flex;
-  list-style: none !important;
-  padding: 0 0 0 18px;
-  margin: 0;
-}
-
-.holding-nav li button {
-  all: unset;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 5px 8px 3px;
-  cursor: pointer;
-}
-.holding-nav li button[disabled] {
-  opacity: .68;
-  cursor: unset;
-}
-.holding-nav li button:not([disabled]):hover {
-  opacity: .68;
-}
-
-.button-hold {
-  all: unset;
-  cursor: pointer;
-  margin-block-start: 0.83em;
-  margin-block-end: 0.83em;
-  transition: all ease-in .06s;
-}
-
-.button-hold.active {
-  color: var(--color-green)
-}
-.button-hold.active:hover {
-
-}
-.button-hold h2 {
-  margin: 0;
 }
 
 .add-card {
@@ -552,49 +338,7 @@ ul.button-editBlock button {
   font-size: 0.8rem;
   display: flex;
 }
-#Newest-Items {
-  grid-area: newestItems;
-  height: 24px;
-  overflow: hidden;
-  border-top: 1px solid var(--color-background);
-}
-#Newest-Items {
-  position: relative;
-}
-#Newest-Items.active {
-  height: 460px;
-  overflow: auto;
-}
-#Newest-Items button {
-  all: unset;
-  cursor: pointer;
-}
-#Newest-Items button.hide {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1;
-  padding-left: 4px;
-  box-sizing: content-box;
-}
-#Newest-Items #ButtonEdit {
-  display: none !important;
-}
-#Newest-Items .item button {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  z-index: 1;
-}
-#Newest-Items .item {
-  position: relative;
-}
-#Newest-Items button.hide i {
-  margin-top: 2px;
-}
+
 
 #EditBlock {
   display: flex;
@@ -624,4 +368,15 @@ ul.button-editBlock button {
   margin: 5px 0 5px 13px;
   padding: 0 8px;
   width: 150px;
+}
+
+@media (max-width: 900px) {
+  #LogdNix {
+    grid-template-columns: 200px 1fr !important;
+  }
+}
+@media (max-width: 600px) {
+  #LogdNix {
+    grid-template-columns: 38px 1fr !important;
+  }
 }

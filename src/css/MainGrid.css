@@ -1,0 +1,87 @@
+:root {
+    --sidebar-width: 38px;
+    --sidebar-width-active: 400px;
+    --sidebar-width-expand: auto;
+    --sidebar-width-inctive: 38px;
+    --controlcenter-height: 22px;
+    --controlcenter-height-active: 460px;
+    --controlcenter-height--inactive: 22px;
+}
+
+#LogdNix {
+    min-height: 100vh;
+    max-height: 100vh;
+    display: grid;
+    grid-template-areas: "sidebar           main"
+                         "controlCenter     controlCenter";
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 1fr auto;
+}
+
+#ControlCenter *, #SideBar *  {
+    transition: all ease .3s;
+}
+#LogdNix > div {
+    transition: all ease .3s;
+    position: relative;
+}
+
+
+#ControlCenter {
+    position: relative;
+    z-index: 100;
+    grid-area: controlCenter;
+    height: var(--controlcenter-height);
+    max-height: 50vh;
+}
+
+#ControlCenter.active {
+    --controlcenter-height: var(--controlcenter-height-active);
+}
+#ControlCenter.inactive {
+    --controlcenter-height: var(--controlcenter-height--inactive);
+}
+
+#SideBar {
+    z-index: 80;
+    justify-content: flex-end;
+    grid-area: sidebar;
+    max-width: var(--sidebar-width);
+}
+#SideBar.active {
+    --sidebar-width: var(--sidebar-width-active);
+}
+#SideBar.inactive {
+    --sidebar-width: var(--sidebar-width-inctive);
+    overflow: hidden;
+}
+#SideBar.expand {
+    --sidebar-width: var(--sidebar-width-expand);
+}
+#SideBar.expand {
+    --sidebar-width: var(--sidebar-width-expand);
+}
+#SideBar-Content {
+    overflow: auto;
+}
+#SideBar.inactive #SideBar-Content {
+    overflow: hidden;
+}
+#Main {
+    grid-area: main;
+    position: relative;
+    z-index: 50;
+}
+
+#Main-Container {
+    display: grid;
+    grid-template-areas:
+        "topBar"
+        "content"
+        "bottomBar";
+    grid-template-rows: 40px auto 33px;
+    height: calc(100vh - var(--controlcenter-height--inactive));
+    position: absolute;
+    right: 0;
+    width: 100%;
+}

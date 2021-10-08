@@ -1,0 +1,30 @@
+.newest-items button {
+    all: unset;
+    cursor: pointer;
+}
+.newest-items button.hide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+    padding-left: 4px;
+    box-sizing: border-box;
+}
+.newest-items #ButtonEdit {
+    display: none !important;
+}
+.newest-items .item button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+.newest-items .item {
+    position: relative;
+}
+.newest-items button.hide i {
+    margin-top: 2px;
+}

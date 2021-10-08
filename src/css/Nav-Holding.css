@@ -1,0 +1,48 @@
+#Hold {
+  grid-area: hold;
+}
+.holding-nav {
+    position: sticky;
+    left: 0;
+    border-right: 1px solid var(--color-background);
+}
+.holding-nav ul {
+    background-color: var(--color-orange);
+    display: flex;
+    list-style: none !important;
+    padding: 0 0 0 18px;
+    margin: 0;
+}
+
+.holding-nav li button {
+    all: unset;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 8px 3px;
+    cursor: pointer;
+}
+.holding-nav li button[disabled] {
+    opacity: .68;
+    cursor: unset;
+}
+.holding-nav li button:not([disabled]):hover {
+    opacity: .68;
+}
+
+.button-hold {
+    all: unset;
+    cursor: pointer;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    transition: all ease-in .06s;
+}
+
+.button-hold.active {
+    color: var(--color-green)
+}
+.button-hold.active:hover {
+
+}
+.button-hold h2 {
+    margin: 0;
+}

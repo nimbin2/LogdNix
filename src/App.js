@@ -1,6 +1,14 @@
 import {useState, useEffect} from "react";
 import '../node_modules/font-awesome/css/font-awesome.min.css';
 import './App.css';
+import './css/Navbar.css';
+import './css/Nav-SideBar.css';
+import './css/Nav-BottomBar.css';
+import './css/Nav-Holding.css';
+import './css/Nav-TopBar.css';
+import './css/Newest-Items.css';
+import './css/ControlCenter.css';
+import './css/MainGrid.css';
 import Block from './components/Block'
 import Navbar from './components/Navbar'
 import OutsideClick from "./components/OutsideClick";
@@ -24,6 +32,7 @@ function App() {
     const [buttonsDisabled, statusButtonsDisabled] = useState(false)
     const [isAdmin, statusIsAdmin] = useState(Block.isAdmin)
     const [hideNav, statusHideNav] = useState(false)
+    const [expandNav, statusExpandNav] = useState(false)
     const [addITEM, statusAddITEM] = useState()
     const [editITEM, statusEditITEM] = useState()
     const [holdBlocks, statusHoldBlocks] = useState([])
@@ -31,14 +40,20 @@ function App() {
     const [reRender, statusReRender] = useState(RenderBlock.reRender)
     const [editorInput, statusEditorInput] = useState()
     const [hideNewest, statusHideNewest] = useState()
+    const [sideBarIsScrollable, statusSideBarIsScrollable] = useState()
+    const [expandBUTTON, statusExpandBUTTON] = useState()
+    const [sideBarWidth, statusSideBarWidth] = useState()
 
     RenderBlock.statusReRender = statusReRender
+    Navbar.statusExpandNav = statusExpandNav
+    Navbar.statusSideBarIsScrollable = statusSideBarIsScrollable
     useEffect(() => {
         Block.active = active
         Block.statusActive = statusActive
         Block.active = active
         RenderBlock.statusReRender(!RenderBlock.reRender)
         Hold.hold && Hold.resetHold(active)
+        Navbar.init()
     }, [active])
 
     useEffect(() => {
@@ -78,14 +93,29 @@ function App() {
         Block.isAdmin = isAdmin
         Block.statusIsAdmin = statusIsAdmin
         RenderBlock.statusReRender(!RenderBlock.reRender)
-        !isAdmin && !Block.hideNav && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true), mainId: "Content" })
+        !isAdmin && !Block.hideNav && OutsideClick.statusInput({id: "SideBar",function: () => Navbar.statusHideNav(true), mainId: "Content" })
     }, [isAdmin])
 
     useEffect(() => {
         Navbar.hideNav = hideNav
         Navbar.statusHideNav = statusHideNav
-        !hideNav && OutsideClick.statusInput({id: "Sidebar",function: () => Navbar.statusHideNav(true), mainId: "Content" })
+        !hideNav && OutsideClick.statusInput({id: "SideBar",function: () => Navbar.statusHideNav(true), mainId: "Content" })
+        hideNav && Navbar.statusExpandNav(false)
+        document.getElementById("ActiveNav")?.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"})
     }, [hideNav])
+
+    useEffect(() => {
+        Navbar.expandNav = expandNav
+        Navbar.statusExpandNav = statusExpandNav
+        expandNav && NewestPosts.statusHideNewest(true)
+        reRenderNavbar()
+    }, [expandNav])
+
+    useEffect(() => {
+        Navbar.sideBarIsScrollable = sideBarIsScrollable
+        Navbar.statusSideBarIsScrollable = statusSideBarIsScrollable
+        console.log("SROLL")
+    }, [sideBarIsScrollable])
 
     useEffect(() => {
         Item.editITEM = editITEM
@@ -125,6 +155,8 @@ function App() {
         reRenderNavbar()
         statusReRenderContent(Content.renderContent())
         document.getElementById("Hold")?.scrollIntoView()
+        Block.init()
+        Navbar.init()
     }, [reRender])
 
     useEffect(() => {
@@ -138,15 +170,30 @@ function App() {
         statusReRenderContent(Content.renderContent())
     }, [hideNewest])
 
+    useEffect(() => {
+        Navbar.expandBUTTON = expandBUTTON
+        Navbar.statusExpandBUTTON = statusExpandBUTTON
+    }, [expandBUTTON])
+
+    useEffect(() => {
+        Navbar.sideBarWidth = sideBarWidth
+        Navbar.statusSideBarWidth = statusSideBarWidth
+    }, [sideBarWidth])
+
 
     Block.positionsSet(Block.options, [])
 
     const reRenderNavbar = () => {
+        statusSideBarIsScrollable(Navbar.getSideBarIsScrollable())
+        !Navbar.sideBarIsScrollable && statusExpandNav(false)
         statusRenderSideBar(Navbar.renderSideBar())
         statusRenderTopBar(Navbar.renderTopBar())
         statusRenderBottomBar(Navbar.renderBottomBar())
-        Block.init()
+        document.getElementById("ActiveNav")?.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"})
     }
+    useEffect(() => {
+        Navbar.init()
+    }, [hideNewest])
 
     const setHoldLayout = () => {
         if (document.getElementById("Hold")) {
@@ -158,35 +205,42 @@ function App() {
         }
     }
 
-    useEffect(() => {
-    })
-
     return (
         <div id="LogdNix">
-            <div id="Sidebar" className={hideNav ? "hidden" : ""}>
-                <button disabled={Block.buttonsDisabled} className={`hideSideBar ${hideNav ? "active" : ""}`} onClick={() => { statusHideNav(!hideNav) }}>
-                    {hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : ( <i className="fa fa-chevron-left" aria-hidden="true"/>)} </button>
-                {renderSideBar}
+            <div id="SideBar" className={`${hideNav ? "inactive" : "active"} ${!hideNav && expandNav ? "expand" : ""}`}>
+                <div id="SideBar-main-buttons">
+                    <button disabled={Block.buttonsDisabled} className={`hideSideBar ${hideNav ? "active" : ""}`} onClick={() => { statusHideNav(!hideNav) }}>
+                        {hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : ( <i className="fa fa-chevron-left" aria-hidden="true"/>)} </button>
+                    {!hideNav && sideBarIsScrollable && Navbar.renderExpandButton()}
+                </div>
+                <div id="SideBar-Content">
+                    {renderSideBar}
+                </div>
             </div>
             <div id="Main">
-                <div id="TopBar">
-                    {renderTopBar}
-                    <div className="buttons-right">
-                        <button disabled={Block.buttonsDisabled} className="button-export" onClick={() => Block.downloadObject(Block.options, "LogdNix.data")}>Export</button>
-                        <div className="fileInput">
-                            <input disabled={Block.buttonsDisabled} id="FileInput" type="file" name="file"/>
-                            <label htmlFor="FileInput">Import</label>
+                <div id="Main-Container">
+                    <div id="TopBar">
+                        {renderTopBar}
+                        <div className="buttons-right">
+                            <button disabled={Block.buttonsDisabled} className="button-export" onClick={() => Block.downloadObject(Block.options, "LogdNix.data")}>Export</button>
+                            <div className="fileInput">
+                                <input disabled={Block.buttonsDisabled} id="FileInput" type="file" name="file"/>
+                                <label htmlFor="FileInput">Import</label>
+                            </div>
+                            <button id="EditMode-button" disabled={Block.buttonsDisabled} className={isAdmin ? "active" : "inActivw"}
+                                    onClick={() => { statusIsAdmin(!isAdmin); }}>{isAdmin ? ("Admin") : ("User")}</button>
                         </div>
-                        <button id="EditMode-button" disabled={Block.buttonsDisabled} className={isAdmin ? "active" : "inActivw"}
-                                onClick={() => { statusIsAdmin(!isAdmin); }}>{isAdmin ? ("Admin") : ("User")}</button>
+                    </div>
+                    <div id="Content">
+                        {reRenderContent}
+                    </div>
+                    <div id="BottomBar">
+                        {renderBottomBar}
                     </div>
                 </div>
-                <div id="Content">
-                    {reRenderContent}
-                </div>
-                <div id="BottomBar">
-                    {renderBottomBar}
-                </div>
+            </div>
+            <div id="ControlCenter" className={`content-block ${NewestPosts.hideNewest ? "inactive" : "active"}`}>
+                {NewestPosts.renderNewestItems()}
             </div>
         </div>
     );

@@ -2,7 +2,6 @@ import {Component} from "react";
 import Item from "./Item";
 import OutsideClick from "./OutsideClick";
 import Block from "./Block";
-import Navbar from "./Navbar";
 
 class NewestPosts extends Component {
     static hideNewest = false
@@ -13,11 +12,11 @@ class NewestPosts extends Component {
     }
 
     static renderNewestItems = () => {
-        return <div id="Newest-Items" className={`content-block ${NewestPosts.hideNewest ? "inactive" : "active"}`}>
+        return <div className="newest-items">
             <h2>Neue Beiträge</h2>
             <div>
                 <button onClick={() => {
-                    this.hideNewest && OutsideClick.statusInput({ id: "Newest-Items", function: () => NewestPosts.statusHideNewest(true), mainId: "Hold"})
+                    this.hideNewest && OutsideClick.statusInput({ id: "ControlCenter", function: () => NewestPosts.statusHideNewest(true), mainId: "Hold"})
                     this.statusHideNewest(!this.hideNewest)
                 }} className="hide"><i className={`fa fa-chevron-${this.hideNewest ? "up" : "down"}`} aria-hidden="true"/></button>
                 {this.newestItems().map((data, i) => {

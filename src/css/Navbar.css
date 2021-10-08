@@ -1,0 +1,32 @@
+
+.navbarButton {
+    all: unset;
+    cursor: pointer;
+    color: #a7b1c2;
+    font-weight: 600;
+    padding: 14px 20px 14px 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.navbarButton:not([disabled]):hover {
+    background-color: #293846;
+    color: #fff;
+}
+.navbarButton:not([disabled]):focus {
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px;
+}
+.navbarButton[disabled] {
+    cursor: unset;
+}
+.navBlock {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.navBlock li {
+    list-style: none;
+}
+.navItem {
+    position: relative;
+}

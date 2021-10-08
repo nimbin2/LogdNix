@@ -2,7 +2,7 @@ import {Component, Fragment} from "react";
 import Item from "./Item";
 import Block from "./Block";
 import Hold from "./Hold";
-import NewestPosts from "./NewestPosts";
+import Navbar from "./Navbar";
 
 class Content extends Component {
 
@@ -47,7 +47,6 @@ class Content extends Component {
                     </Fragment>
                 })}
             </div>
-            {NewestPosts.renderNewestItems()}
         </Fragment>
     )
 }

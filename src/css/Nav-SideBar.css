@@ -1,0 +1,82 @@
+
+#SideBar {
+    position: sticky;
+    display: grid;
+    grid-template-rows: 40px auto;
+    overflow: auto;
+    max-height: 100vh;
+    max-width: 35vw;
+    background-color: var(--color-background);
+}
+#SideBar-main-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.hideSideBar, .expandSideBar {
+    all: unset;
+    cursor: pointer;
+    font-size: 32px;
+    padding: 3px 8px;
+    z-index: 1;
+    color: white;
+}
+
+.hideSideBar.active {
+    width: var(--width-sidebar-hidden);
+    background-color: var(--color-background);
+    height: 100vh;
+    left: 0;
+    z-index: 1;
+    opacity: 0.8;
+}
+.hideSideBar i, .expandSideBar i {
+    opacity: .16;
+}
+.hideSideBar.active i {
+    opacity: 0.3;
+}
+.hideSideBar:hover i, .expandSideBar:hover i {
+    opacity: 0.37;
+}
+#SideBar ul:first-child {
+    min-width: max-content;
+    padding-left: 0;
+    margin-top: 39px;
+}
+
+#SideBar ul.button-editBlock {
+    display: flex !important;
+}
+
+#SideBar .navbarButton.active[disabled] + .button-editBlock {
+    display: flex !important;
+}
+#SideBar .navbarButton.preActive {
+    color: #fff;
+    background-color: var(--color-red) !important;
+    opacity: .78;
+}
+#SideBar .navbarButton.active {
+    color: #fff;
+    background-color: var(--color-green) !important;
+    opacity: .78;
+}
+
+
+@media (max-width: 1200px) {
+    #SideBar {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 900px) {
+    #SideBar {
+        max-width: 300px;
+    }
+}
+@media (max-width: 600px) {
+    #SideBar {
+        max-width: 100vw;
+    }
+}
