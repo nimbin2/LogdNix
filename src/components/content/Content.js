@@ -1,8 +1,8 @@
 import {Component, Fragment} from "react";
-import Item from "./Item";
-import Block from "./Block";
+import Item from "../item/Item";
+import Block from "../block/Block";
 import Hold from "./Hold";
-import Navbar from "./Navbar";
+import Navbar from "../Navbar";
 
 class Content extends Component {
 

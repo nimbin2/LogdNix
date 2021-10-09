@@ -1,8 +1,8 @@
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {Component} from "react";
-import Block from "./Block";
-import OutsideClick from "./OutsideClick";
-import RenderBlock from "./RenderBlock";
+import Block from "../block/Block";
+import Text from "../item/Text";
+import OutsideClick from "../OutsideClick";
+import RenderBlock from "../block/RenderBlock";
 
 
 class Item extends Component {
@@ -10,8 +10,6 @@ class Item extends Component {
     static statusAddITEM
     static editITEM
     static statusEditITEM
-    static editorInput
-    static statusEditorInput
 
     static setBaseItem = (block) => {
         return !block.item && Object.assign(block, {item: []})
@@ -73,19 +71,6 @@ class Item extends Component {
         </div>
     }
 
-    static createEditor = (data) => {
-        ClassicEditor.create( document.querySelector('#editor'), {
-            toolbar: ['heading', '|', 'bold', 'italic', 'link', '|', 'fontColor', 'fontBackgroundColor', '|', 'alignment', 'bulletedList', 'numberedList', 'blockQuote', 'outdent', 'indent', '|', 'insertTable', '|', 'undo', 'redo'],
-            language: "de"
-        }).then( editor => {
-            this.editITEM?.item.text && editor.setData(data);
-            this.statusEditorInput(editor)
-        } )
-            .catch( error => {
-                console.error( error );
-            } );
-    }
-
     static renderInput = (block, item, i) => {
         Block.statusButtonsDisabled(true)
 
@@ -96,7 +81,7 @@ class Item extends Component {
                 <div className="buttons-container">
                     <button className="btn btn-default btn-green" onClick={(e) => {
                         e.preventDefault();
-                        let input = this.editorInput.getData()
+                        let input = Text.editorInput.getData()
                         item ? this.editItem(block, item, i, {text: input, editDate: Block.setDate()}) :
                             input && input.length > 0 && this.addItem(block, {text: input, date: Block.setDate()});
                     }}><i className="fa fa-check" aria-hidden="true"/></button>
@@ -112,7 +97,7 @@ class Item extends Component {
                 <div className="date">{Block.getDate(item.date)}</div>
                 {item.editDate && (<div className="date">bearbeitet: {Block.getDate(item.editDate)}</div>)}
             </div>
-            <div dangerouslySetInnerHTML={{__html: item.text}}/>
+            {Text.renderText(item)}
             <div id="ButtonEdit">
                 {this.editOptions(block, item, i)}
             </div>
@@ -120,13 +105,7 @@ class Item extends Component {
     }
 
     static renderItems = (block) => {return <div id="Items-Main" className="items">
-        <div className="button-add-container">
-            {((Block.isAdmin && this.addITEM?.block !== block) || this.editITEM) && (
-                <button disabled={this.addITEM} className={`btn button-addItem`} onClick={() => {
-                    this.renderInput(block);
-                }}><i className="fa fa-plus" aria-hidden="true"/></button>
-            )}
-        </div>
+        {Text.renderAddText(block)}
         {!this.editITEM && this.addITEM && this.addITEM.block === block &&(
             <div id="AddItem" className="white-card add-card">{this.addITEM.element}</div>
         )}

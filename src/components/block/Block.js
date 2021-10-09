@@ -1,6 +1,6 @@
 import {Component} from "react";
 import moment from "moment";
-import NewestPosts from "./NewestPosts";
+import NewestPosts from "../NewestPosts";
 
 class Block extends Component {
 

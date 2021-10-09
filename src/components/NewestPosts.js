@@ -1,7 +1,7 @@
 import {Component} from "react";
-import Item from "./Item";
+import Item from "./item/Item";
 import OutsideClick from "./OutsideClick";
-import Block from "./Block";
+import Block from "./block/Block";
 
 class NewestPosts extends Component {
     static hideNewest = false

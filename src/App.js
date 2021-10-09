@@ -9,14 +9,15 @@ import './css/Nav-TopBar.css';
 import './css/Newest-Items.css';
 import './css/ControlCenter.css';
 import './css/MainGrid.css';
-import Block from './components/Block'
+import Block from './components/block/Block'
 import Navbar from './components/Navbar'
 import OutsideClick from "./components/OutsideClick";
-import Item from "./components/Item";
-import Content from "./components/Content";
-import Hold from "./components/Hold";
-import RenderBlock from "./components/RenderBlock";
+import Item from "./components/item/Item";
+import Content from "./components/content/Content";
+import Hold from "./components/content/Hold";
+import RenderBlock from "./components/block/RenderBlock";
 import NewestPosts from "./components/NewestPosts";
+import Text from "./components/item/Text";
 
 
 function App() {
@@ -114,7 +115,6 @@ function App() {
     useEffect(() => {
         Navbar.sideBarIsScrollable = sideBarIsScrollable
         Navbar.statusSideBarIsScrollable = statusSideBarIsScrollable
-        console.log("SROLL")
     }, [sideBarIsScrollable])
 
     useEffect(() => {
@@ -132,7 +132,7 @@ function App() {
     useEffect(() => {
         Item.reRenderContent = reRenderContent
         Item.statusReRenderContent = statusReRenderContent
-        addITEM && document.getElementById("Active-form")?.getElementsByClassName("ck-editor__main").length < 1 && Item.createEditor(editITEM?.item.text)
+        addITEM && document.getElementById("Active-form")?.getElementsByClassName("ck-editor__main").length < 1 && Text.createEditor(editITEM?.item.text)
     }, [reRenderContent, addITEM, editITEM])
 
     useEffect(() => {
@@ -160,14 +160,14 @@ function App() {
     }, [reRender])
 
     useEffect(() => {
-        Item.editorInput = editorInput
-        Item.statusEditorInput = statusEditorInput
+        Text.editorInput = editorInput
+        Text.statusEditorInput = statusEditorInput
     }, [editorInput])
 
     useEffect(() => {
         NewestPosts.hideNewest = hideNewest
         NewestPosts.statusHideNewest = statusHideNewest
-        statusReRenderContent(Content.renderContent())
+        reRenderNavbar()
     }, [hideNewest])
 
     useEffect(() => {
@@ -211,7 +211,7 @@ function App() {
                 <div id="SideBar-main-buttons">
                     <button disabled={Block.buttonsDisabled} className={`hideSideBar ${hideNav ? "active" : ""}`} onClick={() => { statusHideNav(!hideNav) }}>
                         {hideNav ? (<i className="fa fa-chevron-right" aria-hidden="true"/>) : ( <i className="fa fa-chevron-left" aria-hidden="true"/>)} </button>
-                    {!hideNav && sideBarIsScrollable && Navbar.renderExpandButton()}
+                    {!hideNav && (sideBarIsScrollable || Navbar.expandNav) && Navbar.renderExpandButton()}
                 </div>
                 <div id="SideBar-Content">
                     {renderSideBar}

@@ -1,5 +1,5 @@
 import {Component} from "react";
-import OutsideClick from "./OutsideClick";
+import OutsideClick from "../OutsideClick";
 import Block from "./Block";
 
 class RenderBlock extends Component {

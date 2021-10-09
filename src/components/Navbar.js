@@ -1,6 +1,6 @@
 import React, {Component} from "react";
-import Block from "./Block";
-import RenderBlock from "./RenderBlock";
+import Block from "./block/Block";
+import RenderBlock from "./block/RenderBlock";
 import NewestPosts from "./NewestPosts";
 
 class Navbar extends Component {
@@ -30,8 +30,7 @@ class Navbar extends Component {
     }
 
     static renderExpandButton = () => {
-        return !this.hideNav && (Navbar.getSideBarIsScrollable() || Navbar.expandNav) &&
-            <button disabled={Block.buttonsDisabled} className={`expandSideBar ${this.hideNav ? "active" : ""}`}
+        return <button disabled={Block.buttonsDisabled} className={`expandSideBar ${this.getSideBarIsScrollable && !this.hideNav ? "active" : ""}`}
                     onClick={() => { this.hideNav && this.statusHideNav(false); this.statusExpandNav(!this.expandNav)}}>
                 {this.expandNav ? (<i className="fa fa-chevron-left" aria-hidden="true"/>) : ( <i className="fa fa-chevron-right" aria-hidden="true"/>)}
             </button>}
